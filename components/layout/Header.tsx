@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { signOut, useSession } from "next-auth/react";
 
 const STORAGE_KEY = "owneronetool-senior-mode";
 
@@ -16,6 +17,7 @@ const navItems = [
 ];
 
 export function Header() {
+  const { status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [seniorMode, setSeniorMode] = useState(false);
 
