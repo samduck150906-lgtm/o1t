@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 import OpenAI from "openai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -140,7 +141,7 @@ export async function POST(request: Request) {
           userId: session.userId,
           type: "booking",
           rawInput: rawText?.slice(0, 2000) ?? (imageBase64 ? "image" : null),
-          result: result as unknown as Record<string, unknown>,
+          result: result as Prisma.InputJsonValue,
           success: true,
         },
       });
