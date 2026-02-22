@@ -36,7 +36,7 @@ function getIndustryGroupedKeywords() {
     const keywords = map.get(industry);
     if (keywords?.length) result.push({ industry, keywords });
   }
-  const remaining = [...map.entries()].filter(([ind]) => !industryOrder.includes(ind));
+  const remaining = Array.from(map.entries()).filter(([ind]) => !industryOrder.includes(ind));
   for (const [industry, keywords] of remaining) result.push({ industry, keywords });
   return result;
 }
