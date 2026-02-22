@@ -1,0 +1,188 @@
+// OWNER ONE-TOOL — Prisma Schema
+// DB: PostgreSQL (Supabase) 또는 MySQL (PlanetScale) 호환
+// 사용: npx prisma generate / npx prisma db push (또는 migrate)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ——— 사장님 계정 ———
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  image         String?
+
+  // 소셜 로그인 (카카오/네이버)
+  accounts Account[]
+
+  // 세션 (NextAuth)
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscription Subscription?
+  branches     Branch[]
+  customers     Customer[]
+  reservations Reservation[]
+  parseLogs     ParseLog[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ——— 구독 상태 (무료체험 / Starter / Pro / Enterprise) ———
+model Subscription {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  plan           String   // "trial" | "starter" | "pro" | "enterprise"
+  status         String   // "active" | "canceled" | "past_due" | "trialing"
+  currentPeriodEnd DateTime?
+  paymentKey     String?  // 토스 등 결제 키
+  orderId        String?  // 주문 ID
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ——— 웹훅 멱등성: 동일 이벤트 중복 처리 방지 ———
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  eventKey  String   @unique // orderId:eventType:paymentKey 또는 orderId:transactionKey
+  eventType String
+  orderId   String
+  processedAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ——— 결제 주문별 secret (웹훅 검증용, DEPOSIT_CALLBACK 등) ———
+model PaymentOrderSecret {
+  orderId   String   @id
+  secret    String
+  createdAt DateTime @default(now())
+}
+
+// ——— 고객 명단 (CRM) ———
+model Customer {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String?
+  phone     String?
+  memo      String?  @db.Text
+  metadata  Json?    // 추가 필드
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ——— 매장(지점) ——— Pro/Enterprise 다중 지점
+model Branch {
+  id       String   @id @default(cuid())
+  userId   String
+  name     String   // 매장명
+  address  String?  // 주소
+  openAt   String?  // 운영 시작 시간 (HH:mm)
+  closeAt  String?  // 운영 종료 시간 (HH:mm)
+  memo     String?  @db.Text
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ——— 예약 데이터 ———
+model Reservation {
+  id     String  @id @default(cuid())
+  userId String
+
+  name   String?
+  phone  String?
+  date   DateTime? // 예약일시
+  people Int?
+  notes  String?  @db.Text
+  status String?  // 예약대기 | 확정 | 문의 | 결제완료
+  amount Int?     // 결제금액(원)
+
+  customerId String? // 선택: 고객 명단과 연결
+  branchId   String?  // 선택: 매장(지점) — Pro/Enterprise
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer   Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, date])
+  @@index([branchId])
+}
+
+// ——— AI 파싱 이력 ———
+model ParseLog {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "booking" | "customer"
+  rawInput  String?  @db.Text // 텍스트 일부 또는 "image"
+  result    Json     // 파싱 결과 JSON
+  success   Boolean  @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
