@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import type { ParsedBooking } from "@/app/api/parse-booking/route";
 import { isBlacklisted } from "@/lib/blacklist";
@@ -194,11 +195,14 @@ export function PasteDropZone({ onAdd, onSaved }: PasteDropZoneProps) {
             />
           </label>
           {imagePreview && (
-            <div className="relative inline-block">
-              <img
+            <div className="relative inline-block size-20 overflow-hidden rounded-lg border border-gray-200">
+              <Image
                 src={imagePreview}
                 alt="첨부한 스크린샷"
-                className="h-20 w-20 rounded-lg border border-gray-200 object-cover"
+                width={80}
+                height={80}
+                className="object-cover"
+                unoptimized
               />
               <button
                 type="button"

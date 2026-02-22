@@ -7,6 +7,8 @@ export function BlacklistCard() {
   const [refresh, setRefresh] = useState(0);
   const list = useMemo(
     () => (typeof window !== "undefined" ? loadBlacklist() : []),
+    // refresh는 목록 갱신 시 재계산을 위한 의도적 트리거
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refresh]
   );
 

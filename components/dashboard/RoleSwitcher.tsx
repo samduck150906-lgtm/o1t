@@ -5,7 +5,12 @@ import { getRole, setRole, setPlan, isEnterprise, type Role } from "@/lib/roles"
 
 export function RoleSwitcher() {
   const [refresh, setRefresh] = useState(0);
-  const role = useMemo(() => getRole(), [refresh]);
+  const role = useMemo(
+    () => getRole(),
+    // refresh는 역할 변경 시 재계산을 위한 의도적 트리거
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [refresh]
+  );
   const [open, setOpen] = useState(false);
 
   const roles: { value: Role; label: string }[] = [

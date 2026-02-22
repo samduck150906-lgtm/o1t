@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     }
   }
 
-  await markWebhookProcessed(idemKey, eventType, orderId ?? "unknown");
+  await markWebhookProcessed(key, eventType, orderId ?? "unknown");
 
   // ——— 비즈니스 처리 ———
   if (eventType === "PAYMENT_STATUS_CHANGED" && payload.status === "DONE") {
