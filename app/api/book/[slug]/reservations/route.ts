@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { addReservation } from "@/lib/booking-store";
 import { addNotification } from "@/lib/notification-store";
+import { notifyOwnerNewBooking } from "@/lib/notification-channels";
 
 const bodySchema = z.object({
   name: z.string().min(1, "이름을 입력해 주세요.").max(200),
