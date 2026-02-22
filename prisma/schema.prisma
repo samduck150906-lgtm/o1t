@@ -3,7 +3,8 @@
 // 사용: npx prisma generate / npx prisma db push (또는 migrate)
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
