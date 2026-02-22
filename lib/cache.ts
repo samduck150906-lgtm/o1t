@@ -43,12 +43,12 @@ export async function cacheDelete(key: string): Promise<void> {
   }
 }
 
-/** 사용자별 예약 목록 캐시 키 */
-export function cacheKeyReservations(userId: string): string {
-  return `reservations:${userId}`;
+/** 업장(businessId)별 예약 목록 캐시 키 — Multi-Tenant 분리 */
+export function cacheKeyReservations(businessId: string): string {
+  return `reservations:${businessId}`;
 }
 
-/** 사용자별 고객 목록 캐시 키 */
-export function cacheKeyCustomers(userId: string): string {
-  return `customers:${userId}`;
+/** 업장(businessId)별 고객 목록 캐시 키 — Multi-Tenant 분리 */
+export function cacheKeyCustomers(businessId: string): string {
+  return `customers:${businessId}`;
 }

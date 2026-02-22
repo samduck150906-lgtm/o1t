@@ -1,230 +1,199 @@
-export interface SeoKeyword {
-  slug: string;
-  title: string;
-  industry: string;
-  painPoint: string;
-  benefit: string;
+/**
+ * ETERNAL SIX - 고효율 SEO 키워드 매트릭스
+ * [업종 10 × 지역 10 × 고통/해결 2] = 200개 고유 데이터셋
+ * SSG(정적 생성) 및 generateMetadata에서 바로 활용
+ */
+
+/** 업종별 메타 설명 카테고리 (CTR용 템플릿 매칭) */
+export type IndustryCategory = "space" | "beauty" | "pet" | "general";
+
+/** 업종 정의: id, 한글명, 메타 템플릿용 카테고리 */
+export const INDUSTRIES = [
+  { id: "party-room", name: "파티룸", category: "space" as IndustryCategory },
+  { id: "rental-studio", name: "렌탈스튜디오", category: "space" as IndustryCategory },
+  { id: "nail-shop", name: "네일샵", category: "beauty" as IndustryCategory },
+  { id: "pet-grooming", name: "애견미용", category: "pet" as IndustryCategory },
+  { id: "oneday-class", name: "원데이클래스", category: "general" as IndustryCategory },
+  { id: "waxing-shop", name: "왁싱샵", category: "beauty" as IndustryCategory },
+  { id: "counseling", name: "심리상담소", category: "general" as IndustryCategory },
+  { id: "coworking", name: "공유오피스", category: "space" as IndustryCategory },
+  { id: "cake-shop", name: "수제케이크", category: "general" as IndustryCategory },
+  { id: "taekwondo", name: "태권도장", category: "general" as IndustryCategory },
+] as const;
+
+/** 지역 (10개) */
+export const LOCATIONS = [
+  { id: "gangnam", name: "강남" },
+  { id: "hongdae", name: "홍대" },
+  { id: "seongsu", name: "성수" },
+  { id: "pangyo", name: "판교" },
+  { id: "bundang", name: "분당" },
+  { id: "incheon", name: "인천" },
+  { id: "busan", name: "부산" },
+  { id: "daegu", name: "대구" },
+  { id: "gwangju", name: "광주" },
+  { id: "daejeon", name: "대전" },
+] as const;
+
+/** 고통/해결 포인트 (2개) — 10×10×2 = 200개 키워드 */
+export const PAINS = [
+  {
+    id: "auto",
+    suffix: "카톡 예약 자동화",
+    point: "일일이 답장하기 힘든 예약 문의",
+    emphasis: "AI 파싱",
+    cta: "카톡 복붙만으로 예약 정리",
+  },
+  {
+    id: "noshow",
+    suffix: "노쇼 방지 블랙리스트",
+    point: "예약 노쇼와 진상 고객 대응",
+    emphasis: "CRM",
+    cta: "노쇼 고객 자동 관리",
+  },
+] as const;
+
+/** 업종별 맞춤형 Pain Point 한 줄 카피 (중복 콘텐츠 방지) */
+export const INDUSTRY_PAIN_COPY: Record<string, string> = {
+  "party-room":
+    "보증금 입금 확인, 카톡 복붙으로 끝내세요. 파티룸 예약 문의가 밤늦게까지 몰려도 한 화면에서 처리할 수 있습니다.",
+  "rental-studio":
+    "촬영팀·개인 고객의 DM 예약을 한곳에 모으고, 타임슬롯 겹침 없이 실시간 반영됩니다.",
+  "nail-shop":
+    "디자이너별 예약이 카톡·전화에 흩어져 있어도, 한 시스템에서 실시간으로 통합 관리됩니다.",
+  "pet-grooming":
+    "펫시터·애견미용 예약과 돌봄 일정을 한 캘린더에서 관리하고, 반려견별 특이사항을 CRM에 남겨 두세요.",
+  "oneday-class":
+    "원데이클래스 신청·결제·확정을 자동화하고, 노쇼 리마인드로 공강을 줄일 수 있습니다.",
+  "waxing-shop":
+    "시술 중 오는 카톡 문의, 이제 AI가 정리해 드립니다. 왁싱 예약과 리필 주기까지 자동 알림됩니다.",
+  counseling:
+    "상담 예약과 회기 관리를 한곳에서 하세요. 노쇼·취소 정책을 자동 안내해 공실을 줄입니다.",
+  coworking:
+    "좌석·회의실 예약을 실시간으로 받고, 결제 연동으로 이중 예약과 미입금을 방지할 수 있습니다.",
+  "cake-shop":
+    "수제케이크 주문·픽업 일정을 한곳에서 관리하고, 카톡 복붙만으로 주문 장부를 자동 정리할 수 있습니다.",
+  taekwondo:
+    "도장 수업·시험 일정과 출결을 한 캘린더에서 관리하고, 노쇼 리마인드로 공강을 줄일 수 있습니다.",
+};
+
+/** CTR용 메타 설명 템플릿 (업종 카테고리별, 최대 140자 권장) */
+export const META_DESCRIPTION_TEMPLATES: Record<IndustryCategory, string> = {
+  space:
+    "{location} {industry} 운영, 아직도 입금 확인 후 직접 캘린더 입력하시나요? 카톡/문자 복붙 한 번에 AI가 예약 장부를 완성합니다. 지금 무료 진단받기!",
+  beauty:
+    "시술 중 예약 문의 전화에 흐름 끊기지 마세요. {location} {industry} 전용 노쇼 방지 블랙리스트와 자동 예약 관리로 매출에만 집중하세요.",
+  pet: "{location} {industry} 사장님을 위한 올인원 SaaS. 흩어져 있는 고객 예약 내역을 AI가 하나로 모아드립니다. 수기 장부 대신 스마트한 관리를 시작하세요.",
+  general:
+    "자영업자 1위 고민 '예약 관리', 이제 AI에게 맡기세요. {location} {industry} 맞춤형 솔루션으로 업무 시간은 줄이고 단골 고객은 늘어납니다.",
+};
+
+export function getMetaDescription(
+  location: string,
+  industry: string,
+  category: IndustryCategory
+): string {
+  const tpl = META_DESCRIPTION_TEMPLATES[category];
+  return tpl.replace(/\{location\}/g, location).replace(/\{industry\}/g, industry);
 }
 
-export const landingKeywords: SeoKeyword[] = [
-  // 파티룸 (10)
-  { slug: "party-room-reservation", title: "파티룸 예약 관리", industry: "파티룸", painPoint: "여러 예약 앱과 전화 문의가 뒤섞여 누락과 이중 예약이 잦습니다. 자정 넘어서 오는 문의와 겹치는 스케줄로 혼란이 큽니다.", benefit: "하나의 캘린더에서 실시간 예약 통합과 무인 예약 자동화로 누락 없이 운영할 수 있습니다." },
-  { slug: "party-room-crm", title: "파티룸 고객 관리", industry: "파티룸", painPoint: "단골과 신규 고객 정보가 카톡·문자·엑셀에 흩어져 있어 재방문 유도가 어렵습니다. 고객별 이용 이력과 선호를 한눈에 보기 힘듭니다.", benefit: "통합 CRM으로 고객 한 명의 모든 기록을 한곳에서 보고 맞춤 프로모션을 보낼 수 있습니다." },
-  { slug: "party-room-noshow", title: "파티룸 노쇼 방지", industry: "파티룸", painPoint: "예약만 하고 오지 않는 손님이 많아 빈 타임이 생깁니다. 당일 취소·노쇼에 대한 사전 안내와 리마인드가 부족합니다.", benefit: "예약 확정 후 자동 리마인드와 노쇼 방지 정책 안내로 공실을 줄일 수 있습니다." },
-  { slug: "party-room-automation", title: "파티룸 예약 자동화", industry: "파티룸", painPoint: "밤늦게까지 수동으로 예약 받고 확인 문자 보내는 일이 반복됩니다. 결제와 예약이 연동되지 않아 이중 작업이 많습니다.", benefit: "24시간 무인 예약·결제·확정까지 한 번에 자동화되어 업무 부담이 줄어듭니다." },
-  { slug: "party-room-booking-system", title: "파티룸 예약 시스템", industry: "파티룸", painPoint: "여러 채널에서 들어오는 예약을 하나로 모으지 못해 캘린더가 항상 어수선합니다. 실시간 반영과 알림이 되지 않습니다.", benefit: "단일 예약 시스템으로 모든 채널 예약이 한 캘린더에 실시간 반영됩니다." },
-  { slug: "party-room-customer-management", title: "파티룸 고객 명단 관리", industry: "파티룸", painPoint: "고객 연락처와 이용 이력을 찾기 위해 여러 곳을 뒤져야 합니다. 단체 예약 시 인원·요청사항을 정리하기 어렵습니다.", benefit: "고객별 명단과 예약 이력이 정리되어 단체·재방문 고객 관리가 쉬워집니다." },
-  { slug: "party-room-schedule", title: "파티룸 일정 관리", industry: "파티룸", painPoint: "타임별 예약 현황을 한 화면에서 보기 어렵고, 청소·준비 시간을 반영한 스케줄링이 되지 않습니다.", benefit: "타임블록 단위 일정과 청소 구간까지 반영된 캘린더로 운영이 명확해집니다." },
-  { slug: "party-room-pricing", title: "파티룸 요금·패키지 관리", industry: "파티룸", painPoint: "평일·주말·이벤트 요금이 제각각인데 수기로 안내하다 보니 실수가 나옵니다. 패키지별 정산도 손이 갑니다.", benefit: "요금표와 패키지를 시스템에 등록해 자동 안내·정산되도록 할 수 있습니다." },
-  { slug: "party-room-review-management", title: "파티룸 리뷰 관리", industry: "파티룸", painPoint: "네이버·카카오·인스타 등 리뷰가 여러 곳에 흩어져 답글과 모니터링이 어렵습니다.", benefit: "리뷰 알림과 답글 관리를 한곳에서 해서 평점 관리가 수월해집니다." },
-  { slug: "party-room-multi-branch", title: "파티룸 다중 지점 관리", industry: "파티룸", painPoint: "지점이 여러 개인데 예약과 매출을 지점별로 보기 어렵고, 통합 리포트가 없습니다.", benefit: "지점별 캘린더·매출·고객을 한 대시보드에서 통합 관리할 수 있습니다." },
-  // 렌탈 스튜디오 (10)
-  { slug: "rental-studio-crm", title: "렌탈 스튜디오 고객 관리", industry: "렌탈 스튜디오", painPoint: "촬영팀·개인 고객 정보가 DM과 전화에 흩어져 있어 재예약 연락이 어렵습니다.", benefit: "고객 DB에 연락처·이용 이력·선호를 모아 재예약과 프로모션에 활용할 수 있습니다." },
-  { slug: "rental-studio-booking", title: "렌탈 스튜디오 예약", industry: "렌탈 스튜디오", painPoint: "타임슬롯 예약을 수기로 하다 보니 겹침과 취소 처리가 혼란스럽습니다.", benefit: "실시간 타임슬롯 예약과 결제 연동으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "rental-studio-schedule", title: "렌탈 스튜디오 일정", industry: "렌탈 스튜디오", painPoint: "촬영·세트·청소 시간을 한 캘린더에 반영하기 어렵습니다.", benefit: "스튜디오·세트별 일정을 한 화면에서 관리하고 공실을 최소화할 수 있습니다." },
-  { slug: "rental-studio-customer-management", title: "렌탈 스튜디오 고객 명단", industry: "렌탈 스튜디오", painPoint: "고객사·PD·포토그래퍼별 연락처와 이력을 정리해 두기 어렵습니다.", benefit: "고객·팀 단위로 명단과 이력을 관리해 재예약과 단체 할인에 활용할 수 있습니다." },
-  { slug: "rental-studio-automation", title: "렌탈 스튜디오 예약 자동화", industry: "렌탈 스튜디오", painPoint: "문의 답변과 예약 확정을 매번 수동으로 하다 보니 시간이 많이 듭니다.", benefit: "예약 요청부터 확정·결제·안내까지 자동화되어 운영 효율이 올라갑니다." },
-  { slug: "rental-studio-payment", title: "렌탈 스튜디오 결제", industry: "렌탈 스튜디오", painPoint: "계약금·잔금 수령을 계좌이체·현금에 의존해 정산이 불명확합니다.", benefit: "온라인 결제와 정기 결제를 연동해 수입 추적과 정산이 쉬워집니다." },
-  { slug: "rental-studio-noshow", title: "렌탈 스튜디오 노쇼 방지", industry: "렌탈 스튜디오", painPoint: "예약만 하고 오지 않거나 당일 취소가 잦아 공실이 발생합니다.", benefit: "예약 전 리마인드와 취소 정책 자동 안내로 노쇼와 공실을 줄일 수 있습니다." },
-  { slug: "rental-studio-pricing", title: "렌탈 스튜디오 요금표", industry: "렌탈 스튜디오", painPoint: "타임·패키지·추가 옵션별 요금을 일일이 안내하기 번거롭습니다.", benefit: "요금표를 시스템에 등록해 예약 시 자동 적용·안내되도록 할 수 있습니다." },
-  { slug: "rental-studio-review", title: "렌탈 스튜디오 리뷰", industry: "렌탈 스튜디오", painPoint: "여러 플랫폼 리뷰를 한곳에서 확인하고 답글하기 어렵습니다.", benefit: "리뷰 알림과 답글 관리를 통합해 평판 관리를 효율적으로 할 수 있습니다." },
-  { slug: "rental-studio-multi-branch", title: "렌탈 스튜디오 다중 지점", industry: "렌탈 스튜디오", painPoint: "여러 스튜디오의 예약·매출을 통합해서 보기 어렵습니다.", benefit: "지점별 예약·매출을 한 대시보드에서 통합 관리할 수 있습니다." },
-  // 학원/교육 (10)
-  { slug: "academy-crm", title: "학원 CRM", industry: "학원·교육", painPoint: "학생·학부모 연락처와 수강 이력이 수첩·엑셀에 흩어져 있습니다.", benefit: "학생·반별 통합 관리로 출결·수강 이력·상담 기록을 한곳에서 볼 수 있습니다." },
-  { slug: "academy-attendance", title: "학원 출결 관리", industry: "학원·교육", painPoint: "출석 체크를 수기로 하다 보니 결석·보강 관리가 어렵습니다.", benefit: "출결 입력과 자동 알림으로 결석·보강 이력을 명확히 관리할 수 있습니다." },
-  { slug: "academy-parent-communication", title: "학원 학부모 연락", industry: "학원·교육", painPoint: "학부모에게 공지·개별 안내를 카톡·문자로 나눠 보내다 보니 누락이 생깁니다.", benefit: "일괄 발송과 개별 메시지를 체계적으로 관리해 소통 누락을 줄일 수 있습니다." },
-  { slug: "academy-schedule", title: "학원 시간표·일정", industry: "학원·교육", painPoint: "반별·강사별 시간표와 보강 일정을 한눈에 정리하기 어렵습니다.", benefit: "시간표와 보강·휴강 일정을 통합 캘린더로 관리할 수 있습니다." },
-  { slug: "academy-enrollment", title: "학원 수강 신청", industry: "학원·교육", painPoint: "수강 신청을 전화·방문으로만 받아 정리와 결제 처리가 지연됩니다.", benefit: "온라인 수강 신청과 결제 연동으로 접수부터 등록까지 단순해집니다." },
-  { slug: "academy-billing", title: "학원 수강료 청구", industry: "학원·교육", painPoint: "월별 수강료 청구와 미수금 관리를 수기로 하다 보니 실수가 납니다.", benefit: "정기 청구와 입금 확인을 시스템으로 관리해 미수금을 줄일 수 있습니다." },
-  { slug: "academy-student-management", title: "학원 학생 관리", industry: "학원·교육", painPoint: "학생별 반·과목·잔여 횟수를 한곳에서 보기 어렵습니다.", benefit: "학생 단위로 반·수강 이력·잔여 횟수를 통합 관리할 수 있습니다." },
-  { slug: "academy-tutor-management", title: "학원 강사 관리", industry: "학원·교육", painPoint: "강사별 담당 반·출강 일정·급여 정산을 정리하기 어렵습니다.", benefit: "강사별 스케줄과 담당 반을 한 화면에서 관리할 수 있습니다." },
-  { slug: "academy-curriculum", title: "학원 커리큘럼 관리", industry: "학원·교육", painPoint: "과정별·단계별 커리큘럼과 수강 기간을 수기로 관리하기 어렵습니다.", benefit: "과정·단계별 등록으로 수강 진행 상황을 체계적으로 추적할 수 있습니다." },
-  { slug: "academy-report", title: "학원 운영 리포트", industry: "학원·교육", painPoint: "등원률·수강 현황·매출을 한 번에 보는 보고서가 없습니다.", benefit: "대시보드로 출결·수강·매출 현황을 한눈에 파악할 수 있습니다." },
-  // 뷰티/헤어샵 (10)
-  { slug: "salon-booking-system", title: "헤어샵 예약 시스템", industry: "뷰티·헤어샵", painPoint: "전화·카톡 예약이 겹치고 디자이너별 스케줄을 한곳에서 보기 어렵습니다.", benefit: "디자이너별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "salon-designer-schedule", title: "헤어샵 디자이너 스케줄", industry: "뷰티·헤어샵", painPoint: "디자이너별 예약과 휴무·시술 시간을 한 캘린더에 반영하기 어렵습니다.", benefit: "디자이너별 캘린더로 시술 순서와 휴식 시간까지 관리할 수 있습니다." },
-  { slug: "salon-customer-crm", title: "헤어샵 고객 관리", industry: "뷰티·헤어샵", painPoint: "단골 고객의 시술 이력과 선호를 기억해 두기 어렵습니다.", benefit: "고객별 시술 이력·메모를 저장해 맞춤 서비스와 재방문 유도에 활용할 수 있습니다." },
-  { slug: "salon-noshow-prevention", title: "헤어샵 노쇼 방지", industry: "뷰티·헤어샵", painPoint: "예약만 하고 오지 않는 고객 때문에 빈 타임이 생깁니다.", benefit: "예약 리마인드와 노쇼 정책 안내로 공실을 줄일 수 있습니다." },
-  { slug: "salon-review-management", title: "헤어샵 리뷰 관리", industry: "뷰티·헤어샵", painPoint: "네이버·인스타 리뷰를 수시로 확인하고 답글하기 어렵습니다.", benefit: "리뷰 알림과 답글을 한곳에서 처리해 평판 관리를 수월하게 할 수 있습니다." },
-  { slug: "salon-membership", title: "헤어샵 멤버십", industry: "뷰티·헤어샵", painPoint: "멤버십 회원의 잔여 횟수·기한을 수기로 관리하기 어렵습니다.", benefit: "회원별 횟수·기한을 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "salon-product-inventory", title: "헤어샵 제품 재고", industry: "뷰티·헤어샵", painPoint: "염색약·제품 재고를 수기로 적다 보니 발주 시점을 놓칩니다.", benefit: "재고 수량과 최소 재고를 등록해 부족 시 알림을 받을 수 있습니다." },
-  { slug: "salon-staff-management", title: "헤어샵 직원 관리", industry: "뷰티·헤어샵", painPoint: "직원별 근무표와 시술 실적을 정리하기 어렵습니다.", benefit: "직원별 스케줄과 실적을 한 화면에서 관리할 수 있습니다." },
-  { slug: "salon-promotion", title: "헤어샵 프로모션", industry: "뷰티·헤어샵", painPoint: "이벤트·할인 안내를 단골에게 골라 보내기 어렵습니다.", benefit: "세그먼트별로 프로모션 메시지를 발송해 반응률을 높일 수 있습니다." },
-  { slug: "salon-multi-branch", title: "헤어샵 다중 지점", industry: "뷰티·헤어샵", painPoint: "지점별 예약·매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 관리할 수 있습니다." },
-  // 무인매장 (10)
-  { slug: "unmanned-store-automation", title: "무인매장 자동화", industry: "무인매장", painPoint: "입장·결제·퇴장을 사람 없이 운영하려면 여러 시스템을 따로 써야 합니다.", benefit: "출입·결제·재고를 하나의 플랫폼으로 연동해 무인 운영을 단순화할 수 있습니다." },
-  { slug: "unmanned-store-remote-management", title: "무인매장 원격 관리", industry: "무인매장", painPoint: "현장에 가지 않고 매출·이상 징후를 확인하기 어렵습니다.", benefit: "원격 대시보드로 매출·출입·알림을 실시간 확인할 수 있습니다." },
-  { slug: "unmanned-store-access-control", title: "무인매장 출입 통제", industry: "무인매장", painPoint: "예약·결제 없이 들어오는 손님을 통제하기 어렵습니다.", benefit: "예약·결제 연동 출입으로 무단 이용을 줄일 수 있습니다." },
-  { slug: "unmanned-store-cctv", title: "무인매장 CCTV 연동", industry: "무인매장", painPoint: "CCTV와 예약·매출 데이터가 따로 놀아 이상 상황 추적이 어렵습니다.", benefit: "이벤트 시점별 영상과 예약·결제 이력을 연계해 확인할 수 있습니다." },
-  { slug: "unmanned-store-payment", title: "무인매장 결제", industry: "무인매장", painPoint: "무인 결제기와 예약·회원 시스템이 연동되지 않습니다.", benefit: "결제와 예약·회원을 한 시스템으로 묶어 정산과 고객 관리가 쉬워집니다." },
-  { slug: "unmanned-store-cs", title: "무인매장 고객 문의", industry: "무인매장", painPoint: "이용 문의·불만을 실시간으로 받고 대응하기 어렵습니다.", benefit: "문의 알림과 자주 묻는 질문 자동 응답으로 CS 부담을 줄일 수 있습니다." },
-  { slug: "unmanned-store-inventory", title: "무인매장 재고", industry: "무인매장", painPoint: "재고 부족·품절을 미리 알기 어렵습니다.", benefit: "재고 수량과 알림 설정으로 품절 전 보충할 수 있습니다." },
-  { slug: "unmanned-store-pricing", title: "무인매장 요금·상품가", industry: "무인매장", painPoint: "시간대별·상품별 요금을 기기마다 일일이 설정하기 번거롭습니다.", benefit: "요금표를 한 번 등록해 모든 단말에 반영할 수 있습니다." },
-  { slug: "unmanned-store-multi-branch", title: "무인매장 다중 지점", industry: "무인매장", painPoint: "여러 지점의 매출·이벤트를 한곳에서 보기 어렵습니다.", benefit: "지점별 매출·알림을 통합 대시보드에서 확인할 수 있습니다." },
-  { slug: "unmanned-store-dashboard", title: "무인매장 대시보드", industry: "무인매장", painPoint: "매출·이용 횟수·이상 징후를 한 화면에서 보기 어렵습니다.", benefit: "실시간 매출·이용 현황·알림을 한 대시보드에서 파악할 수 있습니다." },
-  // 카페/음식점 (10)
-  { slug: "cafe-reservation", title: "카페 예약", industry: "카페·음식점", painPoint: "단체 예약과 일반 예약이 전화·SNS에 섞여 이중 예약이 납니다.", benefit: "한 곳에서 예약을 받고 테이블·인원을 반영해 혼란을 줄일 수 있습니다." },
-  { slug: "cafe-crm", title: "카페 고객 관리", industry: "카페·음식점", painPoint: "단골과 이벤트 참여 고객 정보를 정리해 두기 어렵습니다.", benefit: "고객 DB로 주문 이력·선호를 저장해 리워드·쿠폰에 활용할 수 있습니다." },
-  { slug: "cafe-pos-integration", title: "카페 POS 연동", industry: "카페·음식점", painPoint: "POS 매출과 예약·쿠폰이 연동되지 않아 정산이 복잡합니다.", benefit: "POS와 예약·회원을 연동해 매출과 사용 내역을 한번에 볼 수 있습니다." },
-  { slug: "cafe-staff-schedule", title: "카페 직원 스케줄", industry: "카페·음식점", painPoint: "알바·정직원 근무표를 만들고 공유하기 번거롭습니다.", benefit: "근무표를 시스템으로 작성·공유하고 변경 이력을 남길 수 있습니다." },
-  { slug: "cafe-inventory", title: "카페 재고 관리", industry: "카페·음식점", painPoint: "원두·부재료 재고를 수기로 적다 보니 발주가 늦어집니다.", benefit: "재고 수량과 최소 재고를 등록해 부족 시 알림을 받을 수 있습니다." },
-  { slug: "restaurant-booking", title: "음식점 예약", industry: "카페·음식점", painPoint: "전화 예약만으로는 테이블·시간 관리가 어렵고 노쇼가 많습니다.", benefit: "테이블별·시간대별 예약과 리마인드로 노쇼를 줄일 수 있습니다." },
-  { slug: "restaurant-crm", title: "음식점 고객 관리", industry: "카페·음식점", painPoint: "단골과 모임 고객 연락처를 정리해 두기 어렵습니다.", benefit: "고객별 방문 이력·메모를 저장해 이벤트·재방문 유도에 쓸 수 있습니다." },
-  { slug: "restaurant-waitlist", title: "음식점 대기 명단", industry: "카페·음식점", painPoint: "대기 팀을 수기로 부르다 보니 순서가 꼬일 때가 있습니다.", benefit: "대기 순번과 알림을 시스템으로 관리해 공정하게 호출할 수 있습니다." },
-  { slug: "restaurant-table-management", title: "음식점 테이블 관리", industry: "카페·음식점", painPoint: "테이블별 예약·착석·회전을 한눈에 보기 어렵습니다.", benefit: "테이블별 예약·상태를 한 화면에서 관리해 회전율을 높일 수 있습니다." },
-  { slug: "restaurant-review", title: "음식점 리뷰 관리", industry: "카페·음식점", painPoint: "리뷰 사이트가 여러 개라 답글과 모니터링이 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  // 네일/속눈썹 (10)
-  { slug: "nail-shop-booking", title: "네일샵 예약", industry: "네일·속눈썹", painPoint: "디자이너별 예약이 전화·카톡에 흩어져 겹침이 잦습니다.", benefit: "디자이너별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "nail-shop-crm", title: "네일샵 고객 관리", industry: "네일·속눈썹", painPoint: "고객별 시술 이력과 재방문 주기를 기억하기 어렵습니다.", benefit: "고객별 시술·재방문 이력을 저장해 리필·프로모션 안내에 활용할 수 있습니다." },
-  { slug: "nail-shop-designer-schedule", title: "네일샵 디자이너 스케줄", industry: "네일·속눈썹", painPoint: "디자이너별 예약과 시술 시간을 한 캘린더에 보기 어렵습니다.", benefit: "디자이너별 캘린더로 예약과 시술 순서를 명확히 관리할 수 있습니다." },
-  { slug: "nail-shop-noshow", title: "네일샵 노쇼 방지", industry: "네일·속눈썹", painPoint: "예약만 하고 오지 않아 빈 타임이 생깁니다.", benefit: "예약 리마인드와 취소 정책 안내로 노쇼를 줄일 수 있습니다." },
-  { slug: "nail-shop-membership", title: "네일샵 멤버십", industry: "네일·속눈썹", painPoint: "멤버십 횟수·기한을 수기로 적다 보니 오류가 납니다.", benefit: "회원별 횟수·기한을 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "eyelash-booking", title: "속눈썹 예약", industry: "네일·속눈썹", painPoint: "예약이 카톡·전화에 섞여 디자이너별 스케줄이 혼란스럽습니다.", benefit: "디자이너별 예약을 한 시스템에서 받아 스케줄이 정리됩니다." },
-  { slug: "eyelash-crm", title: "속눈썹 고객 관리", industry: "네일·속눈썹", painPoint: "고객별 리필 주기와 선호 스타일을 정리해 두기 어렵습니다.", benefit: "고객별 시술 이력·메모를 저장해 리필 알림과 맞춤 안내에 쓸 수 있습니다." },
-  { slug: "eyelash-customer-management", title: "속눈썹 고객 명단", industry: "네일·속눈썹", painPoint: "연락처와 시술 이력이 흩어져 재방문 연락이 어렵습니다.", benefit: "고객 명단과 이력을 한곳에서 관리해 재방문·이벤트 안내가 쉬워집니다." },
-  { slug: "eyelash-schedule", title: "속눈썹 일정 관리", industry: "네일·속눈썹", painPoint: "디자이너별 예약과 휴무를 한 캘린더에 반영하기 어렵습니다.", benefit: "디자이너별 일정을 통합해 예약 가능 시간이 명확해집니다." },
-  { slug: "eyelash-review", title: "속눈썹 리뷰 관리", industry: "네일·속눈썹", painPoint: "여러 채널 리뷰를 확인하고 답글하기 시간이 많이 듭니다.", benefit: "리뷰 알림을 모아 보고 빠르게 답글할 수 있습니다." },
-  // 피트니스/PT (10)
-  { slug: "gym-membership-management", title: "헬스장 회원 관리", industry: "피트니스·PT", painPoint: "회원 등록·기간·잔여 횟수를 수기·엑셀로 관리하기 어렵습니다.", benefit: "회원별 기간·횟수를 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "gym-pt-schedule", title: "헬스장 PT 스케줄", industry: "피트니스·PT", painPoint: "PT 강사별 수업 스케줄을 한곳에서 보기 어렵습니다.", benefit: "강사별 PT 일정을 한 캘린더에서 관리할 수 있습니다." },
-  { slug: "gym-crm", title: "헬스장 CRM", industry: "피트니스·PT", painPoint: "회원·상담 고객 정보가 흩어져 재연락과 전환 관리가 어렵습니다.", benefit: "회원·상담 이력을 통합해 재방문·업셀에 활용할 수 있습니다." },
-  { slug: "gym-attendance", title: "헬스장 출석", industry: "피트니스·PT", painPoint: "출석 체크를 수기로 하다 보니 이용 현황 파악이 어렵습니다.", benefit: "출석 기록을 자동으로 쌓아 이용률과 재등록 시기에 활용할 수 있습니다." },
-  { slug: "gym-billing", title: "헬스장 요금 청구", industry: "피트니스·PT", painPoint: "월회비·PT 비용 청구와 미수금 관리가 수동입니다.", benefit: "정기 청구와 입금 확인을 시스템으로 해 미수금을 줄일 수 있습니다." },
-  { slug: "pt-booking-system", title: "PT 예약 시스템", industry: "피트니스·PT", painPoint: "PT 수업 예약이 전화·문자에 의존해 겹침이 납니다.", benefit: "강사별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "pt-customer-management", title: "PT 고객 관리", industry: "피트니스·PT", painPoint: "회원별 PT 횟수·목표·상담 내용을 정리하기 어렵습니다.", benefit: "회원별 PT 이력·메모를 저장해 맞춤 관리에 활용할 수 있습니다." },
-  { slug: "pt-schedule", title: "PT 일정", industry: "피트니스·PT", painPoint: "강사별 수업·휴무를 한 캘린더에 반영하기 어렵습니다.", benefit: "강사별 일정을 통합해 예약 가능 시간을 명확히 할 수 있습니다." },
-  { slug: "pt-payment", title: "PT 결제", industry: "피트니스·PT", painPoint: "PT 패키지 결제와 잔여 횟수 관리가 수동입니다.", benefit: "결제와 횟수 차감을 연동해 잔여 횟수를 자동으로 관리할 수 있습니다." },
-  { slug: "pt-multi-trainer", title: "PT 다중 강사", industry: "피트니스·PT", painPoint: "여러 강사의 스케줄과 매출을 한번에 보기 어렵습니다.", benefit: "강사별 스케줄·매출을 한 대시보드에서 확인할 수 있습니다." },
-  // 병원/의원 (10)
-  { slug: "clinic-reservation", title: "병원 예약", industry: "병원·의원", painPoint: "전화 예약만으로는 대기 시간과 노쇼 관리가 어렵습니다.", benefit: "온라인 예약과 리마인드로 예약 이행률을 높일 수 있습니다." },
-  { slug: "clinic-crm", title: "병원 환자 관리", industry: "병원·의원", painPoint: "환자 연락처와 내원 이력이 종이·엑셀에 흩어져 있습니다.", benefit: "환자별 내원 이력·메모를 한곳에서 관리할 수 있습니다." },
-  { slug: "clinic-patient-management", title: "병원 환자 명단", industry: "병원·의원", painPoint: "재내원·검진 리콜 대상자를 찾기 어렵습니다.", benefit: "환자 명단과 이력을 검색해 리콜·재내원 안내에 활용할 수 있습니다." },
-  { slug: "clinic-schedule", title: "병원 일정", industry: "병원·의원", painPoint: "의사별·진료실별 스케줄을 한눈에 보기 어렵습니다.", benefit: "진료실·의사별 일정을 통합해 예약 가능 시간을 관리할 수 있습니다." },
-  { slug: "clinic-billing", title: "병원 청구·수납", industry: "병원·의원", painPoint: "수납과 보험 청구를 수기로 하다 보니 지연이 납니다.", benefit: "수납·청구 내역을 시스템으로 정리해 정산이 빨라집니다." },
-  { slug: "clinic-review", title: "병원 리뷰", industry: "병원·의원", painPoint: "리뷰 사이트가 여러 개라 모니터링과 답글이 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "clinic-waitlist", title: "병원 대기 명단", industry: "병원·의원", painPoint: "대기 순서와 호출을 수기로 하다 보니 혼란이 있습니다.", benefit: "대기 명단과 호출을 시스템으로 관리해 대기 시간을 줄일 수 있습니다." },
-  { slug: "clinic-recall", title: "병원 리콜", industry: "병원·의원", painPoint: "검진·재내원 리콜 대상자를 골라 연락하기 어렵습니다.", benefit: "조건별로 환자를 검색해 리콜 메시지를 발송할 수 있습니다." },
-  { slug: "clinic-automation", title: "병원 업무 자동화", industry: "병원·의원", painPoint: "예약 확인·리마인드·리콜을 수동으로 하다 보니 시간이 듭니다.", benefit: "예약·리콜 알림을 자동화해 업무 부담을 줄일 수 있습니다." },
-  { slug: "clinic-multi-branch", title: "병원 다중 지점", industry: "병원·의원", painPoint: "지점별 예약·진료 현황을 한번에 보기 어렵습니다.", benefit: "지점별 예약·현황을 통합 대시보드에서 확인할 수 있습니다." },
-  // 숙박/펜션 (10)
-  { slug: "pension-booking", title: "펜션 예약", industry: "숙박·펜션", painPoint: "전화·문자 예약이 겹치고 객실별 예약 현황을 한눈에 보기 어렵습니다.", benefit: "객실별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "pension-crm", title: "펜션 고객 관리", industry: "숙박·펜션", painPoint: "단골과 재방문 고객 정보를 정리해 두기 어렵습니다.", benefit: "고객별 숙박 이력을 저장해 시즌별 프로모션에 활용할 수 있습니다." },
-  { slug: "pension-schedule", title: "펜션 일정", industry: "숙박·펜션", painPoint: "객실별 체크인·체크아웃·청소 구간을 한 캘린더에 보기 어렵습니다.", benefit: "객실별 일정을 통합해 예약 가능 일자를 명확히 할 수 있습니다." },
-  { slug: "pension-pricing", title: "펜션 요금", industry: "숙박·펜션", painPoint: "성수기·비수기·요일별 요금을 일일이 안내하기 번거롭습니다.", benefit: "요금표를 등록해 예약 시 자동 적용·안내되도록 할 수 있습니다." },
-  { slug: "pension-review", title: "펜션 리뷰", industry: "숙박·펜션", painPoint: "예약 사이트별 리뷰를 한곳에서 확인하기 어렵습니다.", benefit: "리뷰를 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "pension-automation", title: "펜션 예약 자동화", industry: "숙박·펜션", painPoint: "예약 확인·입금 안내를 수동으로 하다 보니 밤늦게까지 연락합니다.", benefit: "예약 확정·입금 안내를 자동화해 업무 시간을 줄일 수 있습니다." },
-  { slug: "pension-customer-management", title: "펜션 고객 명단", industry: "숙박·펜션", painPoint: "고객 연락처와 숙박 이력이 흩어져 재방문 연락이 어렵습니다.", benefit: "고객 명단과 이력을 한곳에서 관리해 시즌 프로모션에 활용할 수 있습니다." },
-  { slug: "pension-noshow", title: "펜션 노쇼·취소", industry: "숙박·펜션", painPoint: "입금 없이 예약만 하고 취소·노쇼가 많습니다.", benefit: "입금 기한과 리마인드로 확정률을 높이고 공실을 줄일 수 있습니다." },
-  { slug: "pension-multi-branch", title: "펜션 다중 지점", industry: "숙박·펜션", painPoint: "객실·동별 예약과 매출을 한번에 보기 어렵습니다.", benefit: "객실·동별 예약·매출을 통합 대시보드에서 관리할 수 있습니다." },
-  { slug: "pension-channel-management", title: "펜션 채널 연동", industry: "숙박·펜션", painPoint: "여기어때·야놀자 등 채널 예약을 한곳에 모으기 어렵습니다.", benefit: "채널 예약을 한 캘린더에 모아 이중 예약을 방지할 수 있습니다." },
-  // 공유오피스 (10)
-  { slug: "coworking-space-booking", title: "공유오피스 예약", industry: "공유오피스", painPoint: "좌석·회의실 예약이 수기·엑셀에 의존해 겹침이 납니다.", benefit: "좌석·회의실 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "coworking-crm", title: "공유오피스 회원 관리", industry: "공유오피스", painPoint: "회원 연락처와 이용 이력이 흩어져 있습니다.", benefit: "회원별 이용 이력·결제를 한곳에서 관리할 수 있습니다." },
-  { slug: "coworking-membership", title: "공유오피스 멤버십", industry: "공유오피스", painPoint: "멤버십 종류별 기간·이용 권한을 수기로 관리하기 어렵습니다.", benefit: "멤버십별 기간·권한을 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "coworking-meeting-room", title: "공유오피스 회의실", industry: "공유오피스", painPoint: "회의실 예약과 사용 현황을 한눈에 보기 어렵습니다.", benefit: "회의실별 예약을 한 캘린더에서 관리할 수 있습니다." },
-  { slug: "coworking-billing", title: "공유오피스 요금 청구", industry: "공유오피스", painPoint: "월 이용료·추가 요금 청구가 수동입니다.", benefit: "정기 청구와 결제 연동으로 미수금을 줄일 수 있습니다." },
-  { slug: "coworking-access", title: "공유오피스 출입", industry: "공유오피스", painPoint: "회원별 출입 권한과 이용 일자를 연동하기 어렵습니다.", benefit: "멤버십·예약과 출입 권한을 연동해 관리할 수 있습니다." },
-  { slug: "coworking-multi-branch", title: "공유오피스 다중 지점", industry: "공유오피스", painPoint: "지점별 좌석·회의실 예약과 매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  { slug: "coworking-schedule", title: "공유오피스 일정", industry: "공유오피스", painPoint: "좌석·회의실별 예약 일정을 한 캘린더에 보기 어렵습니다.", benefit: "공간별 일정을 통합해 예약 가능 시간을 명확히 할 수 있습니다." },
-  { slug: "coworking-customer", title: "공유오피스 고객", industry: "공유오피스", painPoint: "입주사·방문객 정보를 정리해 두기 어렵습니다.", benefit: "고객별 연락처·이용 이력을 저장해 재계약·업셀에 활용할 수 있습니다." },
-  { slug: "coworking-automation", title: "공유오피스 자동화", industry: "공유오피스", painPoint: "예약 확인·계약서·요금 안내를 수동으로 보내고 있습니다.", benefit: "예약·계약·요금 안내를 자동화해 운영 효율을 높일 수 있습니다." },
-  // 반려동물 (10)
-  { slug: "pet-grooming-booking", title: "펫살롱 예약", industry: "반려동물", painPoint: "전화·카톡 예약이 겹치고 미용사별 스케줄을 한곳에서 보기 어렵습니다.", benefit: "미용사별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "pet-hotel-reservation", title: "펫호텔 예약", industry: "반려동물", painPoint: "방별·날짜별 예약 현황을 수기로 관리하기 어렵습니다.", benefit: "방별·날짜별 예약을 한 캘린더에서 관리할 수 있습니다." },
-  { slug: "pet-crm", title: "반려동물 업종 CRM", industry: "반려동물", painPoint: "반려견별 이름·품종·특이사항을 정리해 두기 어렵습니다.", benefit: "반려동물·보호자 정보를 한곳에 저장해 맞춤 서비스에 활용할 수 있습니다." },
-  { slug: "pet-customer-management", title: "펫샵 고객 관리", industry: "반려동물", painPoint: "고객과 반려동물 정보가 카톡·수첩에 흩어져 있습니다.", benefit: "고객·반려동물별 이력을 통합해 재방문·리콜에 활용할 수 있습니다." },
-  { slug: "pet-schedule", title: "펫샵 일정", industry: "반려동물", painPoint: "미용·호텔·병원 예약을 한 캘린더에 반영하기 어렵습니다.", benefit: "서비스별·스탭별 일정을 한 화면에서 관리할 수 있습니다." },
-  { slug: "pet-vaccination-tracking", title: "반려동물 예방접종 관리", industry: "반려동물", painPoint: "접종 이력과 다음 접종 일자를 수기로 적다 보니 누락이 납니다.", benefit: "접종 이력과 다음 일자를 등록해 리콜 알림을 보낼 수 있습니다." },
-  { slug: "pet-billing", title: "펫샵 결제·청구", industry: "반려동물", painPoint: "서비스별 요금과 패키지 잔여 횟수 관리가 수동입니다.", benefit: "결제와 횟수 차감을 연동해 잔여 횟수를 자동으로 관리할 수 있습니다." },
-  { slug: "pet-review", title: "펫샵 리뷰", industry: "반려동물", painPoint: "리뷰를 여러 채널에서 확인하고 답글하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "pet-multi-branch", title: "펫샵 다중 지점", industry: "반려동물", painPoint: "지점별 예약·매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  { slug: "pet-automation", title: "펫샵 예약 자동화", industry: "반려동물", painPoint: "예약 확인·리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 업무 부담을 줄일 수 있습니다." },
-  // 세차/차량관리 (10)
-  { slug: "car-wash-booking", title: "세차장 예약", industry: "세차·차량관리", painPoint: "전화 예약만으로는 시간대별 현황을 보기 어렵습니다.", benefit: "시간대별 실시간 예약으로 대기 시간을 줄일 수 있습니다." },
-  { slug: "car-wash-crm", title: "세차장 고객 관리", industry: "세차·차량관리", painPoint: "단골 고객 연락처와 이용 이력이 흩어져 있습니다.", benefit: "고객별 이용 이력을 저장해 정기 방문 알림에 활용할 수 있습니다." },
-  { slug: "car-wash-membership", title: "세차장 멤버십", industry: "세차·차량관리", painPoint: "멤버십 회원의 잔여 횟수·기한을 수기로 관리하기 어렵습니다.", benefit: "회원별 횟수·기한을 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "car-wash-schedule", title: "세차장 일정", industry: "세차·차량관리", painPoint: "세차·상세 작업별 스케줄을 한 캘린더에 보기 어렵습니다.", benefit: "작업별·직원별 일정을 통합해 예약 가능 시간을 관리할 수 있습니다." },
-  { slug: "car-wash-automation", title: "세차장 예약 자동화", industry: "세차·차량관리", painPoint: "예약 확인과 리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 노쇼를 줄일 수 있습니다." },
-  { slug: "car-detailing-booking", title: "차량 디테일링 예약", industry: "세차·차량관리", painPoint: "디테일링 예약이 전화·문자에 의존해 겹침이 납니다.", benefit: "작업별 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "car-detailing-crm", title: "차량 디테일링 고객 관리", industry: "세차·차량관리", painPoint: "고객 차량 정보와 시술 이력을 정리해 두기 어렵습니다.", benefit: "고객·차량별 이력을 저장해 재방문·패키지 안내에 활용할 수 있습니다." },
-  { slug: "car-detailing-schedule", title: "차량 디테일링 일정", industry: "세차·차량관리", painPoint: "작업별 소요 시간을 반영한 스케줄링이 어렵습니다.", benefit: "작업별 블록으로 일정을 관리해 회전율을 높일 수 있습니다." },
-  { slug: "car-detailing-customer", title: "차량 디테일링 고객", industry: "세차·차량관리", painPoint: "고객 연락처와 차량 정보가 흩어져 있습니다.", benefit: "고객·차량 정보를 한곳에서 관리해 리콜에 활용할 수 있습니다." },
-  { slug: "car-detailing-review", title: "차량 디테일링 리뷰", industry: "세차·차량관리", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  // 꽃집/플로리스트 (10)
-  { slug: "flower-shop-order", title: "꽃집 주문 관리", industry: "꽃집·플로리스트", painPoint: "전화·문자 주문이 겹치고 배송 일자 관리가 어렵습니다.", benefit: "주문과 배송 일정을 한 시스템에서 관리해 누락 없이 처리할 수 있습니다." },
-  { slug: "flower-shop-crm", title: "꽃집 고객 관리", industry: "꽃집·플로리스트", painPoint: "기념일·단골 고객 정보를 정리해 두기 어렵습니다.", benefit: "고객별 기념일·선호를 저장해 맞춤 주문 안내에 활용할 수 있습니다." },
-  { slug: "flower-shop-delivery", title: "꽃집 배송", industry: "꽃집·플로리스트", painPoint: "배송 일정과 주소를 수기로 적다 보니 실수가 납니다.", benefit: "주문별 배송 일정·주소를 시스템으로 관리해 배송 누락을 줄일 수 있습니다." },
-  { slug: "flower-shop-schedule", title: "꽃집 일정", industry: "꽃집·플로리스트", painPoint: "주문·제작·배송 일정을 한 캘린더에 보기 어렵습니다.", benefit: "주문·배송 일정을 통합해 제작 일정을 계획할 수 있습니다." },
-  { slug: "flower-shop-customer", title: "꽃집 고객 명단", industry: "꽃집·플로리스트", painPoint: "고객 연락처와 주문 이력이 흩어져 재주문 연락이 어렵습니다.", benefit: "고객 명단과 주문 이력을 한곳에서 관리해 시즌 프로모션에 활용할 수 있습니다." },
-  { slug: "flower-shop-inventory", title: "꽃집 재고", industry: "꽃집·플로리스트", painPoint: "꽃·부재료 재고를 수기로 적다 보니 발주 시점을 놓칩니다.", benefit: "재고 수량과 최소 재고를 등록해 부족 시 알림을 받을 수 있습니다." },
-  { slug: "flower-shop-automation", title: "꽃집 주문 자동화", industry: "꽃집·플로리스트", painPoint: "주문 접수·확인 연락을 수동으로 하고 있습니다.", benefit: "주문 접수·확인 안내를 자동화해 업무 부담을 줄일 수 있습니다." },
-  { slug: "flower-shop-review", title: "꽃집 리뷰", industry: "꽃집·플로리스트", painPoint: "리뷰를 여러 채널에서 확인하고 답글하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "flower-shop-membership", title: "꽃집 구독·멤버십", industry: "꽃집·플로리스트", painPoint: "정기 구독 회원의 배송 주기·결제를 수기로 관리하기 어렵습니다.", benefit: "구독 주기와 결제를 연동해 자동 갱신·배송 안내를 할 수 있습니다." },
-  { slug: "flower-shop-billing", title: "꽃집 결제·청구", industry: "꽃집·플로리스트", painPoint: "선결제·후결제 혼용 시 정산이 복잡합니다.", benefit: "결제 수단별로 정리해 정산과 미수금 관리를 수월하게 할 수 있습니다." },
-  // 사진관/스튜디오 (10)
-  { slug: "photo-studio-booking", title: "사진관 예약", industry: "사진관·스튜디오", painPoint: "촬영 예약이 전화·DM에 흩어져 겹침이 납니다.", benefit: "촬영 타임슬롯 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "photo-studio-crm", title: "사진관 고객 관리", industry: "사진관·스튜디오", painPoint: "고객 연락처와 촬영 이력이 흩어져 재촬영·추가 주문 연락이 어렵습니다.", benefit: "고객별 촬영 이력을 저장해 재촬영·이벤트 안내에 활용할 수 있습니다." },
-  { slug: "photo-studio-schedule", title: "사진관 일정", industry: "사진관·스튜디오", painPoint: "촬영·편집·인수 일정을 한 캘린더에 반영하기 어렵습니다.", benefit: "촬영·후처리 일정을 통합해 납기 관리를 할 수 있습니다." },
-  { slug: "photo-studio-customer", title: "사진관 고객 명단", industry: "사진관·스튜디오", painPoint: "고객사·개인 고객 정보를 정리해 두기 어렵습니다.", benefit: "고객별 연락처·촬영 이력을 한곳에서 관리할 수 있습니다." },
-  { slug: "photo-studio-package", title: "사진관 패키지", industry: "사진관·스튜디오", painPoint: "패키지별 가격·포함 내용을 일일이 안내하기 번거롭습니다.", benefit: "패키지를 시스템에 등록해 예약 시 자동 안내되도록 할 수 있습니다." },
-  { slug: "photo-studio-review", title: "사진관 리뷰", industry: "사진관·스튜디오", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "photo-studio-automation", title: "사진관 예약 자동화", industry: "사진관·스튜디오", painPoint: "예약 확인·리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 노쇼를 줄일 수 있습니다." },
-  { slug: "photo-studio-pricing", title: "사진관 요금", industry: "사진관·스튜디오", painPoint: "촬영 유형별·시간별 요금을 일일이 안내하기 어렵습니다.", benefit: "요금표를 등록해 예약 시 자동 적용·안내할 수 있습니다." },
-  { slug: "photo-studio-gallery", title: "사진관 갤러리", industry: "사진관·스튜디오", painPoint: "촬영본 선택·공유를 수동으로 하다 보니 지연이 납니다.", benefit: "온라인 갤러리로 선택·공유를 단순화할 수 있습니다." },
-  { slug: "photo-studio-multi-branch", title: "사진관 다중 지점", industry: "사진관·스튜디오", painPoint: "지점별 예약·매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  // 세탁소/수선 (10)
-  { slug: "laundry-order-management", title: "세탁소 주문 관리", industry: "세탁소·수선", painPoint: "접수·수거·배달 일정을 수기로 적다 보니 누락이 납니다.", benefit: "주문별 접수·수거·배달 일정을 시스템으로 관리할 수 있습니다." },
-  { slug: "laundry-crm", title: "세탁소 고객 관리", industry: "세탁소·수선", painPoint: "단골 고객 연락처와 주소가 흩어져 있습니다.", benefit: "고객별 연락처·주소·이력을 저장해 픽업·배달 안내에 활용할 수 있습니다." },
-  { slug: "laundry-pickup-delivery", title: "세탁소 픽업·배달", industry: "세탁소·수선", painPoint: "픽업·배달 일정을 수기로 관리하기 어렵습니다.", benefit: "픽업·배달 일정을 캘린더로 관리해 누락 없이 처리할 수 있습니다." },
-  { slug: "laundry-schedule", title: "세탁소 일정", industry: "세탁소·수선", painPoint: "접수·세탁·완료·배달 일정을 한눈에 보기 어렵습니다.", benefit: "주문 단계별 일정을 통합해 납기 관리를 할 수 있습니다." },
-  { slug: "laundry-customer", title: "세탁소 고객 명단", industry: "세탁소·수선", painPoint: "고객 연락처와 주소를 정리해 두기 어렵습니다.", benefit: "고객 명단을 한곳에서 관리해 정기 픽업 안내에 활용할 수 있습니다." },
-  { slug: "laundry-automation", title: "세탁소 업무 자동화", industry: "세탁소·수선", painPoint: "접수 확인·완료 안내를 수동으로 하고 있습니다.", benefit: "접수·완료 안내를 자동화해 고객 만족을 높일 수 있습니다." },
-  { slug: "laundry-billing", title: "세탁소 요금·정산", industry: "세탁소·수선", painPoint: "품목별 요금과 미수금 관리가 수동입니다.", benefit: "요금과 결제를 연동해 미수금을 줄일 수 있습니다." },
-  { slug: "laundry-review", title: "세탁소 리뷰", industry: "세탁소·수선", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "laundry-membership", title: "세탁소 정기 이용", industry: "세탁소·수선", painPoint: "정기 이용 고객의 주기와 결제를 수기로 관리하기 어렵습니다.", benefit: "정기 이용 주기와 결제를 연동해 자동 갱신 안내를 할 수 있습니다." },
-  { slug: "laundry-multi-branch", title: "세탁소 다중 지점", industry: "세탁소·수선", painPoint: "지점별 주문·매출을 한번에 보기 어렵습니다.", benefit: "지점별 주문·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  // 부동산 (10)
-  { slug: "real-estate-crm", title: "부동산 고객 관리", industry: "부동산", painPoint: "매수·매도 희망 고객 정보가 명함·엑셀에 흩어져 있습니다.", benefit: "고객별 관심 지역·예산·이력을 저장해 맞춤 매물 안내에 활용할 수 있습니다." },
-  { slug: "real-estate-customer-management", title: "부동산 고객 명단", industry: "부동산", painPoint: "고객 연락처와 상담 이력을 정리해 두기 어렵습니다.", benefit: "고객 명단과 상담 이력을 한곳에서 관리해 재연락 시기에 활용할 수 있습니다." },
-  { slug: "real-estate-listing", title: "부동산 매물 관리", industry: "부동산", painPoint: "매물 등록·수정·마감을 여러 채널에 따로 반영하기 어렵습니다.", benefit: "매물 정보를 한곳에 등록해 채널별로 공유·수정할 수 있습니다." },
-  { slug: "real-estate-schedule", title: "부동산 일정", industry: "부동산", painPoint: "실사·계약 일정을 수기로 적다 보니 겹침이 납니다.", benefit: "실사·계약 일정을 캘린더로 관리해 이중 예약을 방지할 수 있습니다." },
-  { slug: "real-estate-automation", title: "부동산 업무 자동화", industry: "부동산", painPoint: "매물 등록 알림·상담 리마인드를 수동으로 하고 있습니다.", benefit: "매물 알림·상담 리마인드를 자동화해 기회를 놓치지 않을 수 있습니다." },
-  { slug: "real-estate-lead-management", title: "부동산 리드 관리", industry: "부동산", painPoint: "문의 리드를 정리하고 후속 연락 시기를 관리하기 어렵습니다.", benefit: "리드 단계별로 정리하고 리마인드를 설정해 전환율을 높일 수 있습니다." },
-  { slug: "real-estate-review", title: "부동산 리뷰", industry: "부동산", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "real-estate-billing", title: "부동산 수수료·정산", industry: "부동산", painPoint: "계약별 수수료와 정산 내역을 수기로 정리하기 어렵습니다.", benefit: "계약·수수료를 시스템으로 정리해 정산을 명확히 할 수 있습니다." },
-  { slug: "real-estate-multi-branch", title: "부동산 다중 지점", industry: "부동산", painPoint: "지점별 매물·계약 현황을 한번에 보기 어렵습니다.", benefit: "지점별 매물·계약을 통합 대시보드에서 확인할 수 있습니다." },
-  { slug: "real-estate-communication", title: "부동산 고객 연락", industry: "부동산", painPoint: "고객에게 매물·일정 안내를 일일이 보내기 어렵습니다.", benefit: "세그먼트별로 매물·일정 안내를 발송해 반응률을 높일 수 있습니다." },
-  // 키즈카페 (10)
-  { slug: "kids-cafe-booking", title: "키즈카페 예약", industry: "키즈카페", painPoint: "전화·카톡 예약이 겹치고 인원 제한 관리가 어렵습니다.", benefit: "실시간 예약과 인원 제한으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "kids-cafe-crm", title: "키즈카페 고객 관리", industry: "키즈카페", painPoint: "단골 가족 연락처와 방문 이력이 흩어져 있습니다.", benefit: "가족별 방문 이력을 저장해 생일·이벤트 안내에 활용할 수 있습니다." },
-  { slug: "kids-cafe-schedule", title: "키즈카페 일정", industry: "키즈카페", painPoint: "예약·프로그램·휴관 일정을 한 캘린더에 보기 어렵습니다.", benefit: "예약·프로그램 일정을 통합해 운영 계획을 세우기 쉬워집니다." },
-  { slug: "kids-cafe-customer", title: "키즈카페 고객 명단", industry: "키즈카페", painPoint: "가족별 자녀 연령과 선호를 정리해 두기 어렵습니다.", benefit: "가족별 정보를 한곳에서 관리해 맞춤 프로그램 안내에 활용할 수 있습니다." },
-  { slug: "kids-cafe-membership", title: "키즈카페 멤버십", industry: "키즈카페", painPoint: "멤버십 회원의 잔여 횟수·기한을 수기로 관리하기 어렵습니다.", benefit: "회원별 횟수·기한을 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "kids-cafe-party-booking", title: "키즈카페 파티 예약", industry: "키즈카페", painPoint: "생일 파티 예약과 준비 사항을 수기로 정리하기 어렵습니다.", benefit: "파티 예약과 메뉴·준비 사항을 한 시스템에서 관리할 수 있습니다." },
-  { slug: "kids-cafe-automation", title: "키즈카페 예약 자동화", industry: "키즈카페", painPoint: "예약 확인·리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 노쇼를 줄일 수 있습니다." },
-  { slug: "kids-cafe-review", title: "키즈카페 리뷰", industry: "키즈카페", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "kids-cafe-pricing", title: "키즈카페 요금", industry: "키즈카페", painPoint: "연령별·요일별 요금을 일일이 안내하기 번거롭습니다.", benefit: "요금표를 등록해 예약 시 자동 적용·안내할 수 있습니다." },
-  { slug: "kids-cafe-multi-branch", title: "키즈카페 다중 지점", industry: "키즈카페", painPoint: "지점별 예약·매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  // 골프연습장 (10)
-  { slug: "golf-range-booking", title: "골프연습장 예약", industry: "골프연습장", painPoint: "타석·레슨 예약이 전화·문자에 의존해 겹침이 납니다.", benefit: "타석·레슨 실시간 예약으로 이중 예약 없이 운영할 수 있습니다." },
-  { slug: "golf-range-crm", title: "골프연습장 고객 관리", industry: "골프연습장", painPoint: "회원·레슨 고객 정보가 흩어져 재방문 연락이 어렵습니다.", benefit: "고객별 이용 이력을 저장해 레슨·멤버십 안내에 활용할 수 있습니다." },
-  { slug: "golf-range-membership", title: "골프연습장 멤버십", industry: "골프연습장", painPoint: "회원권 기간·잔여 이용 횟수를 수기로 관리하기 어렵습니다.", benefit: "회원권 기간·횟수를 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "golf-range-schedule", title: "골프연습장 일정", industry: "골프연습장", painPoint: "타석·레슨·대회 일정을 한 캘린더에 보기 어렵습니다.", benefit: "타석·레슨 일정을 통합해 예약 가능 시간을 명확히 할 수 있습니다." },
-  { slug: "golf-range-lesson", title: "골프연습장 레슨", industry: "골프연습장", painPoint: "레슨 예약과 잔여 횟수 관리가 수동입니다.", benefit: "레슨 예약과 횟수 차감을 연동해 잔여 횟수를 자동으로 관리할 수 있습니다." },
-  { slug: "golf-range-automation", title: "골프연습장 예약 자동화", industry: "골프연습장", painPoint: "예약 확인·리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 노쇼를 줄일 수 있습니다." },
-  { slug: "golf-range-billing", title: "골프연습장 요금 청구", industry: "골프연습장", painPoint: "회원권·레슨 비용 청구가 수동입니다.", benefit: "정기 청구와 결제 연동으로 미수금을 줄일 수 있습니다." },
-  { slug: "golf-range-customer", title: "골프연습장 고객 명단", industry: "골프연습장", painPoint: "고객 연락처와 이용 이력이 흩어져 있습니다.", benefit: "고객 명단과 이력을 한곳에서 관리해 프로모션에 활용할 수 있습니다." },
-  { slug: "golf-range-review", title: "골프연습장 리뷰", industry: "골프연습장", painPoint: "리뷰를 여러 채널에서 확인하기 어렵습니다.", benefit: "리뷰 알림을 모아 보고 답글을 체계적으로 관리할 수 있습니다." },
-  { slug: "golf-range-multi-branch", title: "골프연습장 다중 지점", industry: "골프연습장", painPoint: "지점별 예약·매출을 한번에 보기 어렵습니다.", benefit: "지점별 예약·매출을 통합 대시보드에서 확인할 수 있습니다." },
-  // 필라테스/요가 (10)
-  { slug: "pilates-booking", title: "필라테스 예약", industry: "필라테스·요가", painPoint: "수업별·강사별 예약이 전화·카톡에 흩어져 겹침이 납니다.", benefit: "수업별 실시간 예약으로 정원 관리와 이중 예약을 방지할 수 있습니다." },
-  { slug: "pilates-crm", title: "필라테스 고객 관리", industry: "필라테스·요가", painPoint: "회원 연락처와 수강 이력이 흩어져 재등록 연락이 어렵습니다.", benefit: "회원별 수강 이력을 저장해 만료·업셀 안내에 활용할 수 있습니다." },
-  { slug: "pilates-schedule", title: "필라테스 일정", industry: "필라테스·요가", painPoint: "강사별·수업별 스케줄을 한 캘린더에 보기 어렵습니다.", benefit: "수업·강사별 일정을 통합해 예약 가능 수업을 명확히 할 수 있습니다." },
-  { slug: "pilates-membership", title: "필라테스 멤버십", industry: "필라테스·요가", painPoint: "회원권 기간·잔여 횟수를 수기로 관리하기 어렵습니다.", benefit: "회원권 기간·횟수를 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-  { slug: "pilates-instructor", title: "필라테스 강사 관리", industry: "필라테스·요가", painPoint: "강사별 출강·수업 실적을 정리하기 어렵습니다.", benefit: "강사별 스케줄과 수업 실적을 한 화면에서 관리할 수 있습니다." },
-  { slug: "pilates-automation", title: "필라테스 예약 자동화", industry: "필라테스·요가", painPoint: "예약 확인·리마인드를 수동으로 보내고 있습니다.", benefit: "예약 확정·리마인드를 자동화해 노쇼를 줄일 수 있습니다." },
-  { slug: "yoga-booking", title: "요가 예약", industry: "필라테스·요가", painPoint: "수업별 예약이 전화·문자에 의존해 정원 관리가 어렵습니다.", benefit: "수업별 실시간 예약으로 정원을 관리할 수 있습니다." },
-  { slug: "yoga-crm", title: "요가 고객 관리", industry: "필라테스·요가", painPoint: "회원 정보와 수강 이력이 흩어져 있습니다.", benefit: "회원별 수강 이력을 한곳에서 관리해 재등록에 활용할 수 있습니다." },
-  { slug: "yoga-schedule", title: "요가 일정", industry: "필라테스·요가", painPoint: "수업·강사별 스케줄을 한눈에 보기 어렵습니다.", benefit: "수업·강사별 일정을 통합해 예약 가능 수업을 관리할 수 있습니다." },
-  { slug: "yoga-membership", title: "요가 멤버십", industry: "필라테스·요가", painPoint: "회원권 기간·잔여 횟수를 수기로 적다 보니 오류가 납니다.", benefit: "회원권 기간·횟수를 시스템으로 관리하고 만료 알림을 보낼 수 있습니다." },
-];
+/** slug → 지역별 사용 중인 사장님 수 (일관된 수치) */
+function getUsageCountBySlug(slug: string): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  return (h % 41) + 12;
+}
+
+export interface SeoKeyword {
+  id: string;
+  slug: string;
+  location: string;
+  locationId: string;
+  industry: string;
+  industryId: string;
+  industryCategory: IndustryCategory;
+  painPoint: string;
+  painId: string;
+  painEmphasis: string;
+  painCta: string;
+  keyword: string;
+  title: string;
+  description: string;
+  usageCount: number;
+}
+
+function buildLandingKeywords(): SeoKeyword[] {
+  const result: SeoKeyword[] = [];
+  for (const industry of INDUSTRIES) {
+    for (const location of LOCATIONS) {
+      for (const pain of PAINS) {
+        const id = `${location.id}-${industry.id}-${pain.id}`;
+        const title = `${location.name} ${industry.name} ${pain.suffix}`;
+        const description = `${location.name} ${industry.name} 사장님! ${pain.point} 때문에 힘드셨죠? ETERNAL SIX의 AI 파싱 솔루션으로 10초 만에 예약을 정리하세요.`;
+        result.push({
+          id,
+          slug: id,
+          location: location.name,
+          locationId: location.id,
+          industry: industry.name,
+          industryId: industry.id,
+          industryCategory: industry.category,
+          painPoint: pain.point,
+          painId: pain.id,
+          painEmphasis: pain.emphasis,
+          painCta: pain.cta,
+          keyword: title,
+          title,
+          description,
+          usageCount: getUsageCountBySlug(id),
+        });
+      }
+    }
+  }
+  return result;
+}
+
+export const landingKeywords: SeoKeyword[] = buildLandingKeywords();
+
+/** slug로 랜딩 데이터 조회 (generateMetadata / page에서 사용) */
+export function getLandingDataBySlug(slug: string): SeoKeyword | undefined {
+  return landingKeywords.find((k) => k.slug === slug);
+}
+
+/** location + industryType + painType 으로 랜딩 데이터 조회 (페이지 props용) */
+export function getLandingDataByParams(
+  location: string,
+  industryType: string,
+  painType: string
+): SeoKeyword | undefined {
+  const slug = `${location}-${industryType}-${painType}`;
+  return getLandingDataBySlug(slug);
+}
+
+/** 정적 파라미터용 slug 목록 (generateStaticParams) */
+export function getLandingSlugs(): { slug: string }[] {
+  return landingKeywords.map((k) => ({ slug: k.slug }));
+}
+
+/** 정적 파라미터용 3개 props 목록 (generateStaticParams — location/industryType/painType 라우트용) */
+export function getLandingParamTriples(): {
+  location: string;
+  industryType: string;
+  painType: string;
+}[] {
+  return landingKeywords.map((k) => ({
+    location: k.locationId,
+    industryType: k.industryId,
+    painType: k.painId,
+  }));
+}
+
+/** 같은 업종·다른 지역 랜딩 slug 목록 (내부 링크용) */
+export function getSameIndustryOtherLocations(
+  industryId: string,
+  excludeSlug: string
+): SeoKeyword[] {
+  return landingKeywords.filter(
+    (k) => k.industryId === industryId && k.slug !== excludeSlug
+  );
+}

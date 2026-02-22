@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제 실패</title>
+    <style>
+      body { font-family: 'Pretendard', -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; text-align: center; }
+      .fail { color: #e03131; font-size: 1.25rem; margin-bottom: 16px; }
+      .code { font-size: 0.875rem; color: #666; }
+      a { color: #3182f6; }
+    </style>
+  </head>
+  <body>
+    <div class="fail">결제에 실패했습니다.</div>
+    <p id="message"></p>
+    <p class="code" id="code"></p>
+    <a href="/checkout.html">다시 결제하기</a>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById("message").textContent = params.get("message") || "알 수 없는 오류";
+      const code = params.get("code");
+      if (code) document.getElementById("code").textContent = "코드: " + code;
+    </script>
+  </body>
+</html>

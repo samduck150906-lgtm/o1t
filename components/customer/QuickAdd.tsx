@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
-type ParsedCustomer = {
-  name: string | null;
-  phone: string | null;
-  date: string | null;
-  people: number | null;
-  notes: string | null;
-  status: string | null;
-};
+import type { ParsedCustomer } from "@/app/api/parse-customer/route";
+import { isLowConfidence } from "@/lib/parse-confidence";
 
 export function QuickAdd({
   onSave,
@@ -52,8 +45,12 @@ export function QuickAdd({
     }
   }
 
+  const lowConfidence = parsed ? isLowConfidence(parsed.aiConfidenceScore ?? 0) : false;
+
   function handleSave() {
-    if (parsed && onSave) onSave(parsed);
+    if (!parsed || !onSave) return;
+    if (lowConfidence) return; // 자동 등록 막기 — UI에서 버튼 비활성화
+    onSave(parsed);
     setRawText("");
     setParsed(null);
     setModalOpen(false);
@@ -84,7 +81,18 @@ export function QuickAdd({
         {loading ? "추출 중…" : "자동 추출"}
       </button>
       {parsed && (
-        <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4" role="region" aria-label="추출 결과">
+        <div
+          className={`mt-6 rounded-lg border p-4 ${
+            lowConfidence ? "border-red-300 bg-red-50/80" : "border-gray-200 bg-gray-50"
+          }`}
+          role="region"
+          aria-label="추출 결과"
+        >
+          {lowConfidence && (
+            <p role="alert" className="mb-2 text-sm font-medium text-red-700">
+              ⚠ 신뢰도 낮음 ({(parsed.aiConfidenceScore * 100).toFixed(0)}%) — 자동 저장이 차단됩니다. 내용을 확인·수정한 뒤 직접 등록해 주세요.
+            </p>
+          )}
           <h3 className="text-sm font-semibold text-foreground">추출 결과 (확인 후 저장)</h3>
           <dl className="mt-2 space-y-1 text-sm">
             <div><dt className="inline font-medium text-gray-600">이름: </dt><dd className="inline">{parsed.name ?? "-"}</dd></div>
@@ -98,8 +106,10 @@ export function QuickAdd({
             <button
               type="button"
               onClick={handleSave}
-              className="mt-4 flex min-touch items-center justify-center rounded-lg border border-primary bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              disabled={lowConfidence}
+              className="mt-4 flex min-touch items-center justify-center rounded-lg border border-primary bg-white px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="고객 명단에 저장"
+              title={lowConfidence ? "신뢰도가 낮아 자동 저장이 차단되었습니다." : undefined}
             >
               명단에 저장
             </button>

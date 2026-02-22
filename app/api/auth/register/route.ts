@@ -46,19 +46,39 @@ export async function POST(request: Request) {
 
   const passwordHash = await hash(password, 12);
 
+  // Multi-Tenant: User 생성 시 업장(Business) 1개 + 해당 업장 구독(Subscription) 생성
+  const slugBase = email.replace(/@.*$/, "").replace(/[^a-z0-9]/gi, "-").toLowerCase() || "user";
+  const uniqueSlug = `${slugBase}-${Date.now().toString(36)}`;
+
   await prisma.user.create({
     data: {
       email,
       name: name ?? null,
       passwordHash,
-      subscription: {
+      businesses: {
         create: {
-          plan: "trial",
-          status: "trialing",
+          slug: uniqueSlug,
+          name: name ?? undefined,
         },
       },
     },
   });
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { businesses: { orderBy: { createdAt: "asc" }, take: 1 } },
+  });
+  const business = user?.businesses?.[0];
+  if (business) {
+    await prisma.subscription.create({
+      data: {
+        userId: user.id,
+        businessId: business.id,
+        plan: "trial",
+        status: "trialing",
+      },
+    });
+  }
 
   return NextResponse.json({ ok: true, message: "회원가입이 완료되었습니다. 로그인해 주세요." });
 }

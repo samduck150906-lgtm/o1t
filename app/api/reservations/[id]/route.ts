@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cacheDelete, cacheKeyReservations } from "@/lib/cache";
+import { canWrite } from "@/lib/subscription";
 
 export async function GET(
   _request: Request,
@@ -12,9 +13,12 @@ export async function GET(
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
   const { id } = await params;
   const r = await prisma.reservation.findFirst({
-    where: { id, userId: session.userId },
+    where: { id, businessId: session.businessId },
   });
   if (!r) {
     return NextResponse.json({ message: "예약을 찾을 수 없습니다." }, { status: 404 });
@@ -41,6 +45,12 @@ export async function PATCH(
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
+  if (!canWrite(session.subscriptionStatus)) {
+    return NextResponse.json(
+      { message: "결제 문제로 수정할 수 없습니다. 결제를 완료해 주세요." },
+      { status: 403 }
+    );
+  }
   const { id } = await params;
   const body = await request.json().catch(() => ({}));
   const dateValue =
@@ -50,8 +60,11 @@ export async function PATCH(
         : new Date(body.date)
       : undefined;
 
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
   const r = await prisma.reservation.updateMany({
-    where: { id, userId: session.userId },
+    where: { id, businessId: session.businessId },
     data: {
       ...(body.name !== undefined && { name: body.name }),
       ...(body.phone !== undefined && { phone: body.phone }),
@@ -66,21 +79,24 @@ export async function PATCH(
   if (r.count === 0) {
     return NextResponse.json({ message: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
-  await cacheDelete(cacheKeyReservations(session.userId));
-  const updated = await prisma.reservation.findUnique({
-    where: { id },
+  await cacheDelete(cacheKeyReservations(session.businessId));
+  const updated = await prisma.reservation.findFirst({
+    where: { id, businessId: session.businessId },
   });
+  if (!updated) {
+    return NextResponse.json({ message: "예약을 찾을 수 없습니다." }, { status: 404 });
+  }
   return NextResponse.json({
-    id: updated!.id,
-    name: updated!.name,
-    phone: updated!.phone,
-    date: updated!.date?.toISOString() ?? null,
-    people: updated!.people,
-    notes: updated!.notes,
-    status: updated!.status,
-    amount: updated!.amount,
-    customerId: updated!.customerId,
-    createdAt: updated!.createdAt.toISOString(),
+    id: updated.id,
+    name: updated.name,
+    phone: updated.phone,
+    date: updated.date?.toISOString() ?? null,
+    people: updated.people,
+    notes: updated.notes,
+    status: updated.status,
+    amount: updated.amount,
+    customerId: updated.customerId,
+    createdAt: updated.createdAt.toISOString(),
   });
 }
 
@@ -92,13 +108,22 @@ export async function DELETE(
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
+  if (!canWrite(session.subscriptionStatus)) {
+    return NextResponse.json(
+      { message: "결제 문제로 수정할 수 없습니다. 결제를 완료해 주세요." },
+      { status: 403 }
+    );
+  }
   const { id } = await params;
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
   const r = await prisma.reservation.deleteMany({
-    where: { id, userId: session.userId },
+    where: { id, businessId: session.businessId },
   });
   if (r.count === 0) {
     return NextResponse.json({ message: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
-  await cacheDelete(cacheKeyReservations(session.userId));
+  await cacheDelete(cacheKeyReservations(session.businessId));
   return NextResponse.json({ ok: true });
 }

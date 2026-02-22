@@ -9,6 +9,10 @@ type CustomerItem = {
   name: string | null;
   phone: string | null;
   memo: string | null;
+  visitCount: number;
+  totalPayment: number;
+  lastVisitAt: string | null;
+  riskScore: number | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -114,6 +118,10 @@ export default function CustomersPage() {
                   <p className="font-medium text-foreground">{c.name ?? "(이름 없음)"}</p>
                   <p className="text-gray-600">{c.phone ?? "-"}</p>
                   {c.memo && <p className="mt-1 text-gray-500">{c.memo}</p>}
+                  <p className="mt-1 text-gray-500">
+                    방문 {c.visitCount}회 · 총 {c.totalPayment.toLocaleString()}원
+                    {c.lastVisitAt && ` · 마지막 방문 ${new Date(c.lastVisitAt).toLocaleDateString("ko-KR")}`}
+                  </p>
                 </div>
                 <span className="text-xs text-gray-400">
                   등록: {new Date(c.createdAt).toLocaleDateString("ko-KR")}

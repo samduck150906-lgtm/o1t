@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import type { ParsedBooking } from "@/app/api/parse-booking/route";
 import { isBlacklisted } from "@/lib/blacklist";
+import { isLowConfidence } from "@/lib/parse-confidence";
 
 export type ReservationItem = {
   id: string;
@@ -118,7 +119,7 @@ export function PasteDropZone({ onAdd, onSaved }: PasteDropZoneProps) {
     } finally {
       setLoading(false);
     }
-  }, [parsed, onAdd, onSaved, resetInput]);
+  }, [parsed, lowConfidence, onAdd, onSaved, resetInput]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -265,7 +266,9 @@ export function PasteDropZone({ onAdd, onSaved }: PasteDropZoneProps) {
           <button
             type="button"
             onClick={applyToCalendar}
-            className="mt-4 min-touch inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            disabled={lowConfidence}
+            className="mt-4 min-touch inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            title={lowConfidence ? "신뢰도가 낮아 자동 등록이 차단되었습니다." : undefined}
           >
             예약 리스트·캘린더에 추가
           </button>

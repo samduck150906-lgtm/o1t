@@ -1,6 +1,7 @@
 /**
  * slug별 예약 저장소 (서버 메모리).
  * DB 연동 시 Prisma 등으로 교체 가능.
+ * metadata: 업종별 preset (industry-presets.ts 참고)
  */
 
 export type StoredReservation = {
@@ -12,6 +13,7 @@ export type StoredReservation = {
   notes: string | null;
   status: string | null;
   amount: number | null;
+  metadata?: Record<string, unknown>; // 업종별 preset 구조
   createdAt: string;
   source?: "owner" | "customer"; // 대시보드 입력 vs 고객 예약 페이지
 };
@@ -35,6 +37,7 @@ export function addReservation(
   const list = store.get(slug) ?? [];
   const reservation: StoredReservation = {
     ...data,
+    metadata: data.metadata ?? undefined,
     id: nextId(),
     createdAt: new Date().toISOString(),
     source,

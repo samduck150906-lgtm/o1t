@@ -11,7 +11,7 @@ const navItems = [
   { href: "/", label: "홈" },
   { href: "/dashboard", label: "대시보드" },
   { href: "/solution", label: "솔루션" },
-  { href: "/pricing", label: "가격" },
+  { href: "/pricing", label: "가격보기" },
   { href: "/faq", label: "FAQ" },
   { href: "/diagnosis", label: "무료진단" },
 ];
@@ -68,7 +68,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="min-touch text-base font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg px-3 py-2"
+              className="min-touch text-base font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg px-3 py-2 break-keep"
               aria-label={`${item.label} 페이지로 이동`}
             >
               {item.label}
@@ -126,10 +126,10 @@ export function Header() {
           )}
           <Link
             href="/diagnosis"
-            className="min-touch inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-base font-medium text-primary hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            aria-label="무료 진단 시작하기"
+            className="min-touch inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-base font-medium text-primary hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 break-keep"
+            aria-label="무료진단 시작하기"
           >
-            무료 진단
+            무료진단 시작하기
           </Link>
         </div>
 
@@ -168,7 +168,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="min-touch flex items-center rounded-lg px-4 py-4 text-lg font-medium text-foreground hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
+                className="min-touch flex items-center rounded-lg px-4 py-4 text-lg font-medium text-foreground hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset break-keep"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label={`${item.label} 페이지로 이동`}
               >
@@ -231,11 +231,11 @@ export function Header() {
             )}
             <Link
               href="/diagnosis"
-              className="min-touch flex items-center justify-center rounded-lg bg-primary px-4 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset mt-2"
+              className="min-touch flex items-center justify-center rounded-lg bg-primary px-4 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset mt-2 break-keep"
               onClick={() => setMobileMenuOpen(false)}
-              aria-label="무료 진단 시작하기"
+              aria-label="무료진단 시작하기"
             >
-              무료 진단
+              무료진단 시작하기
             </Link>
           </nav>
         </div>

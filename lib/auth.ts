@@ -11,6 +11,7 @@ export type SubscriptionPlan = (typeof SUBSCRIPTION_PLANS)[number];
 declare module "next-auth" {
   interface Session {
     userId: string;
+    businessId: string; // Multi-Tenant: 모든 API 쿼리는 이 값으로 필터 (절대 global query 금지)
     plan: SubscriptionPlan | null;
     subscriptionStatus: string | null;
   }
@@ -19,6 +20,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     userId?: string;
+    businessId?: string;
     plan?: SubscriptionPlan | null;
     subscriptionStatus?: string | null;
   }
@@ -70,12 +72,34 @@ export const authOptions: NextAuthOptions = {
         token.userId = user.id;
       }
       if (token.userId) {
+        // Multi-Tenant: 해당 사용자의 업장(Business) — 세션에 businessId 필수, 모든 API 쿼리 필터에 사용
+        let business = await prisma.business.findFirst({
+          where: { userId: token.userId },
+          orderBy: { createdAt: "asc" },
+        });
+        if (!business) {
+          const slug = `b-${token.userId.slice(0, 8)}`;
+          business = await prisma.business.create({
+            data: {
+              userId: token.userId,
+              slug: slug,
+              name: "내 업장",
+            },
+          });
+        }
+        if (business) token.businessId = business.id;
+
         let sub = await prisma.subscription.findUnique({
           where: { userId: token.userId },
         });
-        if (!sub) {
+        if (!sub && token.businessId) {
           await prisma.subscription.create({
-            data: { userId: token.userId, plan: "trial", status: "trialing" },
+            data: {
+              userId: token.userId,
+              businessId: token.businessId,
+              plan: "trial",
+              status: "trialing",
+            },
           });
           sub = await prisma.subscription.findUnique({
             where: { userId: token.userId },
@@ -89,6 +113,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         (session as { userId?: string }).userId = token.userId ?? "";
+        (session as { businessId?: string }).businessId = token.businessId ?? "";
         (session as { plan?: SubscriptionPlan | null }).plan = token.plan ?? "trial";
         (session as { subscriptionStatus?: string | null }).subscriptionStatus =
           token.subscriptionStatus ?? null;

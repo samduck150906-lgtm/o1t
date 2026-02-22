@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import OpenAI from "openai";
+import { customerConfidence } from "@/lib/parse-confidence";
+import { maskPhoneNumbers } from "@/lib/phone-mask";
 
 const bodySchema = z.object({
   rawText: z.string().min(1, "텍스트를 입력해 주세요.").max(10000),
@@ -12,6 +14,22 @@ const systemPrompt = `너는 고객 관리 전문가야.
 필드: 이름(name), 연락처(phone), 예약날짜(date), 예약인원(people), 특이사항(notes), 상태(status: '예약대기'|'확정'|'문의').
 만약 정보가 없으면 null로 표기해.
 "내일", "이번 주 토요일" 같은 상대 날짜는 오늘 기준 ISO 날짜로 변환해.`;
+
+export type ParseConfidence = {
+  aiConfidenceScore: number;
+  aiRawOutput: Record<string, unknown>;
+};
+
+export type ParsedCustomer = {
+  name: string | null;
+  phone: string | null;
+  date: string | null;
+  people: number | null;
+  notes: string | null;
+  status: string | null;
+  aiConfidenceScore: number;
+  aiRawOutput: Record<string, unknown>;
+};
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -37,11 +55,12 @@ export async function POST(request: Request) {
   }
   try {
     const openai = new OpenAI({ apiKey });
+    const maskedText = maskPhoneNumbers(parsed.data.rawText);
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: parsed.data.rawText },
+        { role: "user", content: maskedText },
       ],
       response_format: { type: "json_object" },
     });
@@ -52,22 +71,18 @@ export async function POST(request: Request) {
         { status: 502 }
       );
     }
-    const data = JSON.parse(content) as {
-      name?: string | null;
-      phone?: string | null;
-      date?: string | null;
-      people?: number | null;
-      notes?: string | null;
-      status?: string | null;
+    const rawOutput = JSON.parse(content) as Record<string, unknown>;
+    const result: ParsedCustomer = {
+      name: (rawOutput.name as string) ?? null,
+      phone: (rawOutput.phone as string) ?? null,
+      date: (rawOutput.date as string) ?? null,
+      people: rawOutput.people != null && typeof rawOutput.people === "number" ? rawOutput.people : null,
+      notes: (rawOutput.notes as string) ?? null,
+      status: (rawOutput.status as string) ?? null,
+      aiConfidenceScore: customerConfidence(rawOutput),
+      aiRawOutput: rawOutput,
     };
-    return NextResponse.json({
-      name: data.name ?? null,
-      phone: data.phone ?? null,
-      date: data.date ?? null,
-      people: data.people ?? null,
-      notes: data.notes ?? null,
-      status: data.status ?? null,
-    });
+    return NextResponse.json(result);
   } catch (err) {
     if (err instanceof SyntaxError) {
       return NextResponse.json(

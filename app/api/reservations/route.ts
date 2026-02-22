@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { cacheGet, cacheSet, cacheDelete, cacheKeyReservations } from "@/lib/cache";
+import { canWrite } from "@/lib/subscription";
 
 const createBodySchema = z.object({
   name: z.string().nullable().optional(),
@@ -14,6 +15,7 @@ const createBodySchema = z.object({
   status: z.string().nullable().optional(),
   amount: z.number().nullable().optional(),
   customerId: z.string().nullable().optional(),
+  metadata: z.record(z.unknown()).nullable().optional(), // 업종별 preset
 });
 
 const CACHE_TTL = 45;
@@ -23,15 +25,18 @@ export async function GET() {
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
 
-  const cacheKey = cacheKeyReservations(session.userId);
+  const cacheKey = cacheKeyReservations(session.businessId);
   const cached = await cacheGet<unknown[]>(cacheKey);
   if (cached != null) {
     return NextResponse.json(cached);
   }
 
   const list = await prisma.reservation.findMany({
-    where: { userId: session.userId },
+    where: { businessId: session.businessId },
     orderBy: { date: "desc" },
     include: { customer: { select: { id: true, name: true, phone: true } } },
   });
@@ -46,6 +51,7 @@ export async function GET() {
     status: r.status,
     amount: r.amount,
     customerId: r.customerId,
+    metadata: r.metadata ?? null,
     createdAt: r.createdAt.toISOString(),
   }));
 
@@ -57,6 +63,15 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
+  }
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
+  if (!canWrite(session.subscriptionStatus)) {
+    return NextResponse.json(
+      { message: "결제 문제로 수정할 수 없습니다. 결제를 완료해 주세요." },
+      { status: 403 }
+    );
   }
 
   let body: unknown;
@@ -85,6 +100,7 @@ export async function POST(request: Request) {
   const reservation = await prisma.reservation.create({
     data: {
       userId: session.userId,
+      businessId: session.businessId,
       name: data.name ?? null,
       phone: data.phone ?? null,
       date: dateValue,
@@ -93,10 +109,11 @@ export async function POST(request: Request) {
       status: data.status ?? null,
       amount: data.amount ?? null,
       customerId: data.customerId ?? null,
+      metadata: data.metadata ?? undefined,
     },
   });
 
-  await cacheDelete(cacheKeyReservations(session.userId));
+  await cacheDelete(cacheKeyReservations(session.businessId));
 
   return NextResponse.json({
     id: reservation.id,
@@ -108,6 +125,7 @@ export async function POST(request: Request) {
     status: reservation.status,
     amount: reservation.amount,
     customerId: reservation.customerId,
+    metadata: reservation.metadata ?? null,
     createdAt: reservation.createdAt.toISOString(),
   });
 }

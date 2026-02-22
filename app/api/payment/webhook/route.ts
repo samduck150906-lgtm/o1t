@@ -7,6 +7,7 @@ import {
   verifyDepositWebhookSecret,
 } from "@/lib/webhook-toss";
 import { prisma } from "@/lib/prisma";
+import { GRACE_DAYS } from "@/lib/subscription";
 
 // 토스 문서: PAYMENT_STATUS_CHANGED는 data, DEPOSIT_CALLBACK은 secret/orderId/transactionKey 등
 const webhookPayloadSchema = z.object({
@@ -100,13 +101,27 @@ export async function POST(request: Request) {
   await markWebhookProcessed(key, eventType, orderId ?? "unknown");
 
   // ——— 비즈니스 처리 ———
-  if (eventType === "PAYMENT_STATUS_CHANGED" && payload.status === "DONE") {
+  if (eventType === "PAYMENT_STATUS_CHANGED") {
     const oid = orderId ?? (payload as { orderId?: string }).orderId;
+    const status = (payload as { status?: string }).status;
     if (oid) {
-      await prisma.subscription.updateMany({
-        where: { orderId: oid },
-        data: { status: "active", paymentKey: payload.paymentKey ?? undefined },
-      });
+      if (status === "DONE") {
+        await prisma.subscription.updateMany({
+          where: { orderId: oid },
+          data: { status: "active", paymentKey: payload.paymentKey ?? undefined },
+        });
+      } else if (
+        status &&
+        ["ABORTED", "CANCELED", "EXPIRED", "PARTIAL_CANCELED"].includes(status)
+      ) {
+        // 결제 실패/취소/만료 → grace 3~7일 유지, 대시보드 읽기 전용
+        const graceEndsAt = new Date();
+        graceEndsAt.setDate(graceEndsAt.getDate() + GRACE_DAYS);
+        await prisma.subscription.updateMany({
+          where: { orderId: oid },
+          data: { status: "grace", graceEndsAt },
+        });
+      }
     }
   }
   if (

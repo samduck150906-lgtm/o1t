@@ -15,10 +15,10 @@ export function CTA() {
         </p>
         <Link
           href="/diagnosis"
-          className="mt-8 inline-flex min-touch items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary"
-          aria-label="무료 진단 시작하기"
+          className="mt-8 inline-flex min-touch items-center justify-center rounded-xl bg-white px-8 py-4 text-lg font-medium text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary break-keep"
+          aria-label="무료진단 시작하기"
         >
-          무료 진단 시작하기
+          무료진단 시작하기
         </Link>
       </div>
     </section>

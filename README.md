@@ -1,48 +1,44 @@
-# OWNER ONE-TOOL (O1T)
+# 토스페이먼츠 결제 연동
 
-ETERNAL SIX 산하 SaaS 공식 웹사이트. Next.js 14 (App Router) + TypeScript 기반.
+토스페이먼츠 결제위젯을 사용한 결제 연동 예제입니다.
 
-## 실행 순서
+## 필요한 키
 
-1. **의존성 설치**
+- **클라이언트 키 (live_gck_...)**  
+  결제 화면(프론트)에서 사용. 이미 `checkout.html`에 설정되어 있습니다.
+- **시크릿 키 (live_gsk_...)**  
+  결제 승인은 서버에서만 사용. **절대 클라이언트나 GitHub에 올리지 마세요.**
+
+시크릿 키는 [토스페이먼츠 개발자센터](https://developers.tosspayments.com/my/api-keys) → API 키 → 결제위젯 연동 키에서 확인할 수 있습니다.
+
+## 실행 방법
+
+1. 시크릿 키 설정  
+   프로젝트 폴더에 `.env` 파일을 만들고 다음 내용을 넣습니다.
+   ```env
+   TOSS_SECRET_KEY=live_gsk_여기에_시크릿키
+   ```
+   (Windows에서 `.env` 자동 로드가 안 되면) 터미널에서 직접 지정해서 실행할 수 있습니다.
    ```bash
-   npm install
+   set TOSS_SECRET_KEY=live_gsk_여기에_시크릿키
+   node server.js
    ```
 
-2. **환경 변수 설정**
-   - `.env.example`을 복사해 `.env.local` 생성
-   - 실제 키 입력 (Toss, OpenAI, 구글/네이버 인증 코드)
-
-3. **로고 이미지**
-   - `public/logo.png` — 워드마크 포함 가로형 로고
-   - `public/logo-icon.png` — 심볼 아이콘만
-   - 제공된 로고 이미지를 위 경로에 배치하세요.
-
-4. **개발 서버**
+2. 서버 실행  
    ```bash
-   npm run dev
+   node server.js
    ```
 
-5. **품질 검증**
-   ```bash
-   npm run lint
-   npm run typecheck
-   npm run build
-   ```
+3. 브라우저에서 결제 테스트  
+   http://localhost:3000 접속 후 결제하기 버튼으로 결제를 진행합니다.
 
-6. **프로덕션 실행**
-   ```bash
-   npm run start
-   ```
+## 흐름
 
-## 주요 경로
+1. **checkout.html** – 결제위젯 표시, 주문 생성(`/api/orders`) 후 결제 요청
+2. **success.html** – 결제 성공 리다이렉트 후 서버에 승인 요청(`/api/confirm`)
+3. **server.js** – 주문 저장, 토스페이먼츠 결제 승인 API 호출
 
-- `/` — 홈
-- `/solution` — 솔루션 소개
-- `/pricing` — 가격
-- `/diagnosis` — 무료 진단 폼
-- `/faq` — FAQ
-- `/o1t` — 제품 상세
-- `/landing/[slug]` — 키워드 랜딩 200개 (SSG)
+## 주의사항
 
-Base URL: https://owneronetool.com
+- `live_` 키는 **실제 결제**가 발생합니다. 테스트 시에는 테스트 키(`test_gck_...`, `test_gsk_...`) 사용을 권장합니다.
+- 시크릿 키는 반드시 서버 환경 변수로만 관리하고, 코드나 클라이언트에 포함하지 마세요.

@@ -18,17 +18,17 @@ export function Hero() {
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
             href="/diagnosis"
-            className="min-touch inline-flex w-full items-center justify-center rounded-xl bg-primary px-8 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto"
-            aria-label="무료 진단 시작하기"
+            className="min-touch inline-flex w-full items-center justify-center rounded-xl bg-primary px-8 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto break-keep"
+            aria-label="무료진단 시작하기"
           >
-            무료 진단 시작하기
+            무료진단 시작하기
           </Link>
           <Link
             href="/pricing"
-            className="min-touch inline-flex w-full items-center justify-center rounded-xl border-2 border-gray-300 bg-white px-8 py-4 text-lg font-medium text-foreground hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto"
-            aria-label="가격 보기"
+            className="min-touch inline-flex w-full items-center justify-center rounded-xl border-2 border-gray-300 bg-white px-8 py-4 text-lg font-medium text-foreground hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto break-keep"
+            aria-label="가격보기"
           >
-            가격 보기
+            가격보기
           </Link>
         </div>
       </div>

@@ -46,5 +46,37 @@ export async function POST(request: Request) {
   }
   lastSubmitByEmail.set(email.toLowerCase(), now);
   store.push({ email, source, at: new Date().toISOString() });
+
+  // 신청 내역을 cinging1000@naver.com 으로 발송
+  const recipient = "cinging1000@naver.com";
+  const apiKey = process.env.RESEND_API_KEY;
+  if (apiKey) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: process.env.RESEND_FROM ?? "OWNER ONE-TOOL <onboarding@resend.dev>",
+          to: [recipient],
+          subject: "[무료진단] 새 신청",
+          html: [
+            "<h2>무료 진단 신청</h2>",
+            `<p><strong>이메일:</strong> ${email}</p>`,
+            `<p><strong>유입 경로:</strong> ${source || "-"}</p>`,
+            `<p><strong>신청 시각:</strong> ${new Date().toLocaleString("ko-KR")}</p>`,
+          ].join(""),
+        }),
+      });
+      if (!res.ok) {
+        console.error("Resend 이메일 발송 실패:", await res.text());
+      }
+    } catch (e) {
+      console.error("이메일 발송 중 오류:", e);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }

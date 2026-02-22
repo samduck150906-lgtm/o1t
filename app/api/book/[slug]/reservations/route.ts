@@ -10,6 +10,7 @@ const bodySchema = z.object({
   date: z.string().min(1, "예약일시를 선택해 주세요."),
   people: z.number().int().min(1).optional(),
   notes: z.string().max(2000).optional(),
+  metadata: z.record(z.unknown()).optional(), // 업종별 preset (PARTYROOM/BEAUTY/PET 등)
 });
 
 export async function POST(
@@ -31,7 +32,7 @@ export async function POST(
     const msg = parsed.error.errors[0]?.message ?? "Invalid body";
     return NextResponse.json({ message: msg }, { status: 400 });
   }
-  const { name, phone, date, people, notes } = parsed.data;
+  const { name, phone, date, people, notes, metadata } = parsed.data;
   const reservation = addReservation(
     slug.trim(),
     {
@@ -42,6 +43,7 @@ export async function POST(
       notes: notes ?? null,
       status: "예약대기",
       amount: null,
+      metadata: metadata ?? undefined,
     },
     "customer"
   );

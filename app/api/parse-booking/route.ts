@@ -5,8 +5,11 @@ import OpenAI from "openai";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canWrite } from "@/lib/subscription";
 import { parseBookingLimiter, checkRateLimit } from "@/lib/ratelimit";
 import { apiError } from "@/lib/api-response";
+import { bookingConfidence } from "@/lib/parse-confidence";
+import { maskPhoneNumbers } from "@/lib/phone-mask";
 
 const bodySchema = z.object({
   rawText: z.string().max(20000).optional(),
@@ -14,6 +17,11 @@ const bodySchema = z.object({
 }).refine((d) => d.rawText?.trim() || d.imageBase64, {
   message: "텍스트 또는 이미지를 입력해 주세요.",
 });
+
+export type ParseConfidence = {
+  aiConfidenceScore: number;
+  aiRawOutput: Record<string, unknown>;
+};
 
 export type ParsedBooking = {
   name: string | null;
@@ -23,6 +31,10 @@ export type ParsedBooking = {
   notes: string | null;
   status: string | null;
   amount?: number | null;
+  /** AI 파싱 신뢰도 0~1. 낮으면 UI에서 경고·자동 등록 차단 */
+  aiConfidenceScore: number;
+  /** 모델 원본 JSON (디버깅·감사용) */
+  aiRawOutput: Record<string, unknown>;
 };
 
 const systemPrompt = `너는 예약·결제 정보 추출 및 OCR 전문가야.
@@ -43,6 +55,12 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.userId) {
     return apiError("로그인이 필요합니다.", 401, "UNAUTHORIZED");
+  }
+  if (!session.businessId) {
+    return apiError("업장 정보가 없습니다. 관리자에게 문의하세요.", 403, "FORBIDDEN");
+  }
+  if (!canWrite(session.subscriptionStatus)) {
+    return apiError("결제 문제로 수정할 수 없습니다. 결제를 완료해 주세요.", 403, "FORBIDDEN");
   }
   const limit = await checkRateLimit(parseBookingLimiter, session.userId);
   if (!limit.success) {
@@ -78,6 +96,7 @@ export async function POST(request: Request) {
 
   const openai = new OpenAI({ apiKey });
   const { rawText, imageBase64 } = parsed.data;
+  const textForOpenAI = rawText?.trim() ? maskPhoneNumbers(rawText.trim()) : "";
 
   try {
     let content: string;
@@ -96,7 +115,7 @@ export async function POST(request: Request) {
                   url: imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`,
                 },
               },
-              ...(rawText?.trim() ? [{ type: "text" as const, text: rawText }] : []),
+              ...(textForOpenAI ? [{ type: "text" as const, text: textForOpenAI }] : []),
             ],
           },
         ],
@@ -108,7 +127,7 @@ export async function POST(request: Request) {
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: (rawText ?? "").trim() },
+          { role: "user", content: textForOpenAI },
         ],
         response_format: { type: "json_object" },
       });
@@ -123,26 +142,30 @@ export async function POST(request: Request) {
     }
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    const data = JSON.parse(jsonMatch ? jsonMatch[0] : content) as Record<string, unknown>;
+    const rawOutput = JSON.parse(jsonMatch ? jsonMatch[0] : content) as Record<string, unknown>;
     const result: ParsedBooking = {
-      name: (data.name as string) ?? null,
-      phone: (data.phone as string) ?? null,
-      date: (data.date as string) ?? null,
-      people: typeof data.people === "number" ? data.people : null,
-      notes: (data.notes as string) ?? null,
-      status: (data.status as string) ?? null,
-      amount: typeof data.amount === "number" ? data.amount : null,
+      name: (rawOutput.name as string) ?? null,
+      phone: (rawOutput.phone as string) ?? null,
+      date: (rawOutput.date as string) ?? null,
+      people: typeof rawOutput.people === "number" ? rawOutput.people : null,
+      notes: (rawOutput.notes as string) ?? null,
+      status: (rawOutput.status as string) ?? null,
+      amount: typeof rawOutput.amount === "number" ? rawOutput.amount : null,
+      aiConfidenceScore: bookingConfidence(rawOutput),
+      aiRawOutput: rawOutput,
     };
 
-    const session = await getServerSession(authOptions);
-    if (session?.userId) {
+    if (session?.userId && session.businessId) {
       await prisma.parseLog.create({
         data: {
           userId: session.userId,
+          businessId: session.businessId,
           type: "booking",
           rawInput: rawText?.slice(0, 2000) ?? (imageBase64 ? "image" : null),
-          result: result as Prisma.InputJsonValue,
+          result: { ...result, aiConfidenceScore: result.aiConfidenceScore, aiRawOutput: result.aiRawOutput } as Prisma.InputJsonValue,
           success: true,
+          aiConfidenceScore: result.aiConfidenceScore,
+          aiRawOutput: result.aiRawOutput as Prisma.InputJsonValue,
         },
       });
     }

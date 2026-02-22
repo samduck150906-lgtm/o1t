@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { cacheGet, cacheSet, cacheDelete, cacheKeyCustomers } from "@/lib/cache";
+import { canWrite } from "@/lib/subscription";
 
 const createBodySchema = z.object({
   name: z.string().nullable().optional(),
@@ -18,15 +19,18 @@ export async function GET() {
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
   }
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
 
-  const cacheKey = cacheKeyCustomers(session.userId);
+  const cacheKey = cacheKeyCustomers(session.businessId);
   const cached = await cacheGet<unknown>(cacheKey);
   if (cached != null) {
     return NextResponse.json(cached);
   }
 
   const list = await prisma.customer.findMany({
-    where: { userId: session.userId },
+    where: { businessId: session.businessId },
     orderBy: { updatedAt: "desc" },
   });
 
@@ -36,6 +40,10 @@ export async function GET() {
     phone: c.phone,
     memo: c.memo,
     metadata: c.metadata,
+    visitCount: c.visitCount,
+    totalPayment: c.totalPayment,
+    lastVisitAt: c.lastVisitAt?.toISOString() ?? null,
+    riskScore: c.riskScore,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
   }));
@@ -48,6 +56,15 @@ export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.userId) {
     return NextResponse.json({ message: "로그인이 필요합니다." }, { status: 401 });
+  }
+  if (!session.businessId) {
+    return NextResponse.json({ message: "업장 정보가 없습니다. 관리자에게 문의하세요." }, { status: 403 });
+  }
+  if (!canWrite(session.subscriptionStatus)) {
+    return NextResponse.json(
+      { message: "결제 문제로 수정할 수 없습니다. 결제를 완료해 주세요." },
+      { status: 403 }
+    );
   }
 
   let body: unknown;
@@ -70,13 +87,14 @@ export async function POST(request: Request) {
   const customer = await prisma.customer.create({
     data: {
       userId: session.userId,
+      businessId: session.businessId,
       name: parsed.data.name ?? null,
       phone: parsed.data.phone ?? null,
       memo: parsed.data.memo ?? null,
     },
   });
 
-  await cacheDelete(cacheKeyCustomers(session.userId));
+  await cacheDelete(cacheKeyCustomers(session.businessId));
 
   return NextResponse.json({
     id: customer.id,
@@ -84,6 +102,10 @@ export async function POST(request: Request) {
     phone: customer.phone,
     memo: customer.memo,
     metadata: customer.metadata,
+    visitCount: customer.visitCount,
+    totalPayment: customer.totalPayment,
+    lastVisitAt: customer.lastVisitAt?.toISOString() ?? null,
+    riskScore: customer.riskScore,
     createdAt: customer.createdAt.toISOString(),
     updatedAt: customer.updatedAt.toISOString(),
   });

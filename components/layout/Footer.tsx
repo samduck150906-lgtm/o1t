@@ -1,37 +1,16 @@
 import Link from "next/link";
-import { landingKeywords } from "@/lib/seo-keywords";
+import { INDUSTRIES, landingKeywords, type SeoKeyword } from "@/lib/seo-keywords";
 
-const industryOrder = [
-  "파티룸",
-  "렌탈 스튜디오",
-  "학원·교육",
-  "뷰티·헤어샵",
-  "무인매장",
-  "카페·음식점",
-  "네일·속눈썹",
-  "피트니스·PT",
-  "병원·의원",
-  "숙박·펜션",
-  "공유오피스",
-  "반려동물",
-  "세차·차량관리",
-  "꽃집·플로리스트",
-  "사진관·스튜디오",
-  "세탁소·수선",
-  "부동산",
-  "키즈카페",
-  "골프연습장",
-  "필라테스·요가",
-];
+const industryOrder = INDUSTRIES.map((i) => i.name);
 
-function getIndustryGroupedKeywords() {
-  const map = new Map<string, typeof landingKeywords>();
+function getIndustryGroupedKeywords(): { industry: string; keywords: SeoKeyword[] }[] {
+  const map = new Map<string, SeoKeyword[]>();
   for (const kw of landingKeywords) {
     const list = map.get(kw.industry) ?? [];
     list.push(kw);
     map.set(kw.industry, list);
   }
-  const result: { industry: string; keywords: typeof landingKeywords }[] = [];
+  const result: { industry: string; keywords: SeoKeyword[] }[] = [];
   for (const industry of industryOrder) {
     const keywords = map.get(industry);
     if (keywords?.length) result.push({ industry, keywords });
@@ -58,7 +37,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/pricing" className="min-touch inline-flex py-2 text-base text-gray-700 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
-                  가격
+                  가격보기
                 </Link>
               </li>
               <li>
@@ -114,11 +93,11 @@ export function Footer() {
                     {keywords.map((kw) => (
                       <li key={kw.slug}>
                         <Link
-                          href={`/landing/${kw.slug}`}
+                          href={`/landing/${kw.locationId}/${kw.industryId}/${kw.painId}`}
                           className="min-touch inline-block py-0.5 text-sm text-gray-700 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-                          aria-label={`${kw.title} - ${industry}`}
+                          aria-label={`${kw.keyword} - ${industry}`}
                         >
-                          {kw.title}
+                          {kw.keyword}
                         </Link>
                       </li>
                     ))}
@@ -129,7 +108,18 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 sm:mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:pt-8 md:flex-row">
+        <div className="mt-10 sm:mt-12 border-t border-gray-200 pt-6 sm:pt-8 space-y-6">
+          <div className="rounded-lg bg-gray-50 px-4 py-4 text-sm text-gray-700">
+            <h3 className="font-semibold text-foreground mb-2">사업자정보</h3>
+            <ul className="space-y-1 break-keep" aria-label="사업자 정보">
+              <li>상호: 이터널식스</li>
+              <li>대표: 성아름</li>
+              <li>사업자등록번호: 3032865658</li>
+              <li>전화: 010-8111-9370</li>
+              <li>주소: 수원시 영통구 삼성로 186 4층</li>
+            </ul>
+          </div>
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-center md:text-left text-base text-gray-600">
             © {new Date().getFullYear()} ETERNAL SIX. OWNER ONE-TOOL. All rights reserved.
           </p>
@@ -143,12 +133,13 @@ export function Footer() {
             <Link href="/solution" className="min-touch inline-flex py-2 text-base text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="솔루션">
               솔루션
             </Link>
-            <Link href="/pricing" className="min-touch inline-flex py-2 text-base text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="가격">
-              가격
+            <Link href="/pricing" className="min-touch inline-flex py-2 text-base text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="가격보기">
+              가격보기
             </Link>
             <Link href="/faq" className="min-touch inline-flex py-2 text-base text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded" aria-label="FAQ">
               FAQ
             </Link>
+          </div>
           </div>
         </div>
       </div>

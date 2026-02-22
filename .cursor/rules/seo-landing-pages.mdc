@@ -1,0 +1,35 @@
+---
+description: SEO 랜딩 200개 — 랜딩 페이지는 location/industryType/painType props와 동적 OG 이미지를 반드시 사용
+globs: app/landing/**/*.tsx, app/landing/**/*.ts, lib/seo-keywords.ts
+alwaysApply: false
+---
+
+# SEO 랜딩 페이지 규칙
+
+## 랜딩 페이지별 필수 3개 props
+
+랜딩 페이지는 반드시 다음 세 가지를 **params(또는 props)로 전달**받아 사용한다.
+
+- **location** — 지역 ID (예: `gangnam`, `hongdae`)
+- **industryType** — 업종 ID (예: `party-room`, `nail-shop`)
+- **painType** — 고통/해결 포인트 ID (예: `auto`, `noshow`)
+
+- 라우트 경로: `app/landing/[location]/[industryType]/[painType]/`
+- 데이터 조회: `getLandingDataByParams(location, industryType, painType)` 사용
+- 내부 링크: `/landing/${locationId}/${industryId}/${painId}` 형식으로 생성
+
+## generateMetadata
+
+- **OpenGraph image는 동적으로 생성**한다.
+- `openGraph.images`에 해당 페이지 전용 OG 이미지 URL을 넣는다.
+  - 예: `${canonical}/opengraph-image` (세그먼트 내 `opengraph-image.tsx` 사용)
+- 네이버·소셜 공유에서 OG 이미지가 중요하므로 누락하지 않는다.
+
+## 동적 OG 이미지
+
+- `app/landing/[location]/[industryType]/[painType]/opengraph-image.tsx`에서 `ImageResponse`로 페이지별 이미지 생성.
+- params에서 `location`, `industryType`, `painType`을 받아 `getLandingDataByParams`로 데이터 조회 후 타이틀/부제 노출.
+
+## 기존 [slug] 경로
+
+- `/landing/[slug]`는 **리다이렉트 전용**으로만 유지한다. `getLandingDataBySlug(slug)`로 조회 후 `/landing/${locationId}/${industryType}/${painId}`로 redirect.
