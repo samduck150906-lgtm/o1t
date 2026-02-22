@@ -21,7 +21,7 @@ export function loadReservations(): Reservation[] {
     return Array.isArray(parsed)
       ? parsed.filter(
           (r): r is Reservation =>
-            r &&
+            !!r &&
             typeof r === "object" &&
             typeof (r as Reservation).id === "string" &&
             typeof (r as Reservation).createdAt === "string"
