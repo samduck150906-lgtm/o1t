@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const { withSentryConfig } = require("@sentry/nextjs");
-
 const nextConfig = {
   images: {
     remotePatterns: [],
@@ -10,9 +8,14 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG ?? "",
-  project: process.env.SENTRY_PROJECT ?? "",
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: true,
-});
+try {
+  const { withSentryConfig } = require("@sentry/nextjs");
+  module.exports = withSentryConfig(nextConfig, {
+    org: process.env.SENTRY_ORG ?? "",
+    project: process.env.SENTRY_PROJECT ?? "",
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+  });
+} catch (_) {
+  module.exports = nextConfig;
+}
