@@ -1,5 +1,4 @@
 [build]
-  base = "o1t"
   command = "npm run build"
 
 [build.environment]
