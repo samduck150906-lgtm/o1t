@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+  # 빌드 시 prisma generate용 (실제 DB는 Netlify 대시보드 환경변수에 설정)
+  DATABASE_URL = "postgresql://build:build@localhost:5432/build"
+  # Sentry 없이 빌드 가능하도록 (선택 사항)
+  SENTRY_AUTH_TOKEN = ""
+  CI = "true"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

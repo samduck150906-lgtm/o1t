@@ -1,0 +1,14 @@
+{
+  "name": "tosspayments-integration",
+  "version": "1.0.0",
+  "description": "토스페이먼츠 결제위젯 연동 예제",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "generate-keywords": "npx tsx scripts/generate-keywords.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  }
+}
