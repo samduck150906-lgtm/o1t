@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제하기 | 토스페이먼츠</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: 'Pretendard', -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; }
+      h1 { font-size: 1.25rem; margin-bottom: 24px; }
+      #payment-method { min-height: 320px; margin-bottom: 16px; }
+      #agreement { margin-bottom: 24px; }
+      .button {
+        width: 100%; padding: 14px; font-size: 1rem; font-weight: 600;
+        background: #3182f6; color: #fff; border: none; border-radius: 8px; cursor: pointer;
+      }
+      .button:hover { background: #1b64da; }
+      .button:disabled { background: #e0e0e0; cursor: not-allowed; }
+    </style>
+  </head>
+  <body>
+    <h1>주문 결제</h1>
+    <div id="payment-method"></div>
+    <div id="agreement"></div>
+    <button class="button" id="payment-button" disabled>결제하기</button>
+
+    <script>
+      const CLIENT_KEY = "live_gck_ZLKGPx4M3MpG0OOEvlW78BaWypv1";
+      const BASE_URL = window.location.origin;
+
+      async function main() {
+        const button = document.getElementById("payment-button");
+        const amount = 50000;
+
+        const tossPayments = TossPayments(CLIENT_KEY);
+        const widgets = tossPayments.widgets({
+          customerKey: TossPayments.ANONYMOUS,
+        });
+
+        await widgets.setAmount({ currency: "KRW", value: amount });
+
+        await Promise.all([
+          widgets.renderPaymentMethods({ selector: "#payment-method", variantKey: "DEFAULT" }),
+          widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
+        ]);
+
+        button.disabled = false;
+
+        button.addEventListener("click", async function () {
+          button.disabled = true;
+          try {
+            const res = await fetch(BASE_URL + "/api/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount, orderName: "테스트 주문" }),
+            });
+            const { orderId } = await res.json();
+            if (!orderId) throw new Error("주문 생성 실패");
+
+            await widgets.requestPayment({
+              orderId,
+              orderName: "테스트 주문",
+              successUrl: BASE_URL + "/success.html",
+              failUrl: BASE_URL + "/fail.html",
+            });
+          } catch (e) {
+            console.error(e);
+            alert(e.message || "결제 요청 중 오류가 발생했습니다.");
+          } finally {
+            button.disabled = false;
+          }
+        });
+      }
+
+      main();
+    </script>
+  </body>
+</html>

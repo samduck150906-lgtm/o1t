@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제 성공</title>
+    <style>
+      body { font-family: 'Pretendard', -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; text-align: center; }
+      .success { color: #3182f6; font-size: 1.5rem; margin-bottom: 16px; }
+      .info { text-align: left; background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0; font-size: 0.875rem; }
+      a { color: #3182f6; }
+    </style>
+  </head>
+  <body>
+    <div class="success">결제가 완료되었습니다.</div>
+    <p id="message">결제 승인 처리 중입니다...</p>
+    <div class="info" id="detail" style="display: none;"></div>
+    <a href="/checkout.html">다시 결제하기</a>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const paymentKey = params.get("paymentKey");
+      const orderId = params.get("orderId");
+      const amount = params.get("amount");
+
+      if (!paymentKey || !orderId || !amount) {
+        document.getElementById("message").textContent = "결제 정보가 없습니다.";
+      } else {
+        fetch("/api/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentKey, orderId, amount: Number(amount) }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const el = document.getElementById("message");
+            const detail = document.getElementById("detail");
+            if (data.paymentKey) {
+              el.textContent = "결제 승인이 완료되었습니다.";
+              detail.style.display = "block";
+              detail.innerHTML = `
+                <strong>주문번호</strong>: ${data.orderId}<br>
+                <strong>결제키</strong>: ${data.paymentKey}<br>
+                <strong>결제금액</strong>: ${Number(data.totalAmount).toLocaleString()}원
+              `;
+            } else {
+              el.textContent = data.message || "승인 처리 중 오류가 발생했습니다.";
+            }
+          })
+          .catch(() => {
+            document.getElementById("message").textContent = "서버 오류가 발생했습니다. 결제는 완료되었을 수 있으니 주문 내역을 확인해 주세요.";
+          });
+      }
+    </script>
+  </body>
+</html>
