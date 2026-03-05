@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { cacheGet, cacheSet, cacheDelete, cacheKeyReservations } from "@/lib/cache";
@@ -109,7 +110,7 @@ export async function POST(request: Request) {
       status: data.status ?? null,
       amount: data.amount ?? null,
       customerId: data.customerId ?? null,
-      metadata: data.metadata ?? undefined,
+      metadata: (data.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
     },
   });
 

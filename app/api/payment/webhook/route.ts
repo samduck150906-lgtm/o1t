@@ -7,7 +7,6 @@ import {
   verifyDepositWebhookSecret,
 } from "@/lib/webhook-toss";
 import { prisma } from "@/lib/prisma";
-import { GRACE_DAYS } from "@/lib/subscription";
 
 // 토스 문서: PAYMENT_STATUS_CHANGED는 data, DEPOSIT_CALLBACK은 secret/orderId/transactionKey 등
 const webhookPayloadSchema = z.object({
@@ -114,12 +113,10 @@ export async function POST(request: Request) {
         status &&
         ["ABORTED", "CANCELED", "EXPIRED", "PARTIAL_CANCELED"].includes(status)
       ) {
-        // 결제 실패/취소/만료 → grace 3~7일 유지, 대시보드 읽기 전용
-        const graceEndsAt = new Date();
-        graceEndsAt.setDate(graceEndsAt.getDate() + GRACE_DAYS);
+        // 결제 실패/취소/만료 → grace 상태로 변경 (GRACE_DAYS 기간 읽기 전용)
         await prisma.subscription.updateMany({
           where: { orderId: oid },
-          data: { status: "grace", graceEndsAt },
+          data: { status: "grace" },
         });
       }
     }

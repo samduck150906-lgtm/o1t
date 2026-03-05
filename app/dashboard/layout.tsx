@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  const readOnly = isReadOnly(session?.subscriptionStatus ?? null);
+  const readOnly = isReadOnly(session);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 md:py-8">

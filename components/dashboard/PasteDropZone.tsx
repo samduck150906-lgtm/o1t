@@ -119,7 +119,7 @@ export function PasteDropZone({ onAdd, onSaved }: PasteDropZoneProps) {
     } finally {
       setLoading(false);
     }
-  }, [parsed, lowConfidence, onAdd, onSaved, resetInput]);
+  }, [parsed, onAdd, onSaved, resetInput]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -266,9 +266,9 @@ export function PasteDropZone({ onAdd, onSaved }: PasteDropZoneProps) {
           <button
             type="button"
             onClick={applyToCalendar}
-            disabled={lowConfidence}
+            disabled={parsed ? isLowConfidence(parsed.aiConfidenceScore) : true}
             className="mt-4 min-touch inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            title={lowConfidence ? "신뢰도가 낮아 자동 등록이 차단되었습니다." : undefined}
+            title={parsed && isLowConfidence(parsed.aiConfidenceScore) ? "신뢰도가 낮아 자동 등록이 차단되었습니다." : undefined}
           >
             예약 리스트·캘린더에 추가
           </button>

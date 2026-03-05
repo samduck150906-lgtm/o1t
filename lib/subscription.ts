@@ -6,6 +6,7 @@
 import type { Session } from "next-auth";
 
 export const GRACE_STATUS = "grace";
+export const GRACE_DAYS = 7;
 
 export function isReadOnly(session: Session | null): boolean {
   return (session as { subscriptionStatus?: string | null } | null)?.subscriptionStatus === GRACE_STATUS;
