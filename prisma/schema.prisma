@@ -1,4 +1,4 @@
-// OWNER ONE-TOOL — Prisma Schema
+// 원툴러 — Prisma Schema
 // DB: PostgreSQL (Supabase) 또는 MySQL (PlanetScale) 호환
 // 사용: npx prisma generate / npx prisma db push (또는 migrate)
 

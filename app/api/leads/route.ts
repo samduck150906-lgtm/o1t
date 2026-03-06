@@ -59,7 +59,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: process.env.RESEND_FROM ?? "OWNER ONE-TOOL <onboarding@resend.dev>",
+          from: process.env.RESEND_FROM ?? "원툴러 <onboarding@resend.dev>",
           to: [recipient],
           subject: "[무료진단] 새 신청",
           html: [

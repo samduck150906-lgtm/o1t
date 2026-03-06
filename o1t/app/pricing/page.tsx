@@ -7,10 +7,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 export const metadata: Metadata = {
   title: "가격",
   description:
-    "OWNER ONE-TOOL 요금: Starter 29,000원, Pro 59,000원(가장 많이 선택), Enterprise 별도 문의. 14일 무료 체험 후 유료 전환, 약정 없이 해지 가능.",
+    "원툴러 요금: Starter 29,000원, Pro 59,000원(가장 많이 선택), Enterprise 별도 문의. 14일 무료 체험 후 유료 전환, 약정 없이 해지 가능.",
   alternates: { canonical: `${SITE_URL}/pricing` },
   openGraph: {
-    title: "가격 | OWNER ONE-TOOL",
+    title: "가격 | 원툴러",
     description: "Starter·Pro·Enterprise 플랜. 14일 무료 체험.",
     url: `${SITE_URL}/pricing`,
   },

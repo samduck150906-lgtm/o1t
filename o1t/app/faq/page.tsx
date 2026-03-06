@@ -6,10 +6,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 export const metadata: Metadata = {
   title: "FAQ",
   description:
-    "OWNER ONE-TOOL 자주 묻는 질문: 예약 데이터 이전, 다중 매장 관리, 카톡 복붙 고객 등록, 결제 수단, 무료 체험, 데이터 보안, 기술 지원.",
+    "원툴러 자주 묻는 질문: 예약 데이터 이전, 다중 매장 관리, 카톡 복붙 고객 등록, 결제 수단, 무료 체험, 데이터 보안, 기술 지원.",
   alternates: { canonical: `${SITE_URL}/faq` },
   openGraph: {
-    title: "FAQ | OWNER ONE-TOOL",
+    title: "FAQ | 원툴러",
     description: "자주 묻는 질문과 답변.",
     url: `${SITE_URL}/faq`,
   },
@@ -53,7 +53,7 @@ export default function FAQPage() {
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16 md:py-20">
         <h1 className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">자주 묻는 질문</h1>
         <p className="mt-4 text-gray-600 text-base sm:text-[1em]">
-          OWNER ONE-TOOL 도입과 이용에 대해 자주 묻는 질문과 답변입니다.
+          원툴러 도입과 이용에 대해 자주 묻는 질문과 답변입니다.
         </p>
         <dl className="mt-8 sm:mt-12 space-y-4 sm:space-y-6" role="list">
           {faqData.map((item, index) => (

@@ -5,7 +5,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 
 export const metadata: Metadata = {
   title: "개인정보 처리방침",
-  description: "OWNER ONE-TOOL 개인정보 처리방침.",
+  description: "원툴러 개인정보 처리방침.",
   alternates: { canonical: `${SITE_URL}/privacy` },
   robots: "index, follow",
 };
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground">1. 개인정보의 수집·이용 목적</h2>
           <p>
-            ETERNAL SIX(이하 &quot;회사&quot;)는 OWNER ONE-TOOL 서비스 제공, 결제·구독 처리, 고객 문의 대응, 서비스 개선을 위해
+            ETERNAL SIX(이하 &quot;회사&quot;)는 원툴러 서비스 제공, 결제·구독 처리, 고객 문의 대응, 서비스 개선을 위해
             최소한의 개인정보를 수집·이용합니다. 수집 항목과 보유 기간은 아래와 같습니다.
           </p>
         </section>

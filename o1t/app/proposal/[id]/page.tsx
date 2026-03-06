@@ -11,8 +11,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const prospect = await getProspect(params.id);
   return {
     title: prospect
-      ? `${prospect.store_name} 맞춤 AI 자동화 제안서 | OWNER ONE-TOOL`
-      : "AI 자동화 제안서 | OWNER ONE-TOOL",
+      ? `${prospect.store_name} 맞춤 AI 자동화 제안서 | 원툴러`
+      : "AI 자동화 제안서 | 원툴러",
     robots: "noindex, nofollow",
   };
 }

@@ -35,7 +35,7 @@ export async function sendEmailNotification(payload: NewBookingPayload): Promise
   try {
     const { Resend } = await import("resend");
     const resend = new Resend(apiKey);
-    const from = process.env.RESEND_FROM ?? "OWNER ONE-TOOL <onboarding@resend.dev>";
+    const from = process.env.RESEND_FROM ?? "원툴러 <onboarding@resend.dev>";
     const subject = `[새 예약] ${payload.customerName}님 · ${payload.date}`;
     const html = `
       <p>새 예약이 접수되었습니다.</p>

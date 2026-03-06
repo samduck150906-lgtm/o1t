@@ -6,10 +6,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 export const metadata: Metadata = {
   title: "무료 진단",
   description:
-    "이메일과 유입 경로만 알려주시면 OWNER ONE-TOOL 맞춤 도입 단계와 예상 효과를 안내해 드립니다. 무료 진단 신청.",
+    "이메일과 유입 경로만 알려주시면 원툴러 맞춤 도입 단계와 예상 효과를 안내해 드립니다. 무료 진단 신청.",
   alternates: { canonical: `${SITE_URL}/diagnosis` },
   openGraph: {
-    title: "무료 진단 | OWNER ONE-TOOL",
+    title: "무료 진단 | 원툴러",
     description: "맞춤 도입 단계와 예상 효과를 무료로 안내해 드립니다.",
     url: `${SITE_URL}/diagnosis`,
   },

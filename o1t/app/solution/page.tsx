@@ -6,10 +6,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 export const metadata: Metadata = {
   title: "솔루션 소개",
   description:
-    "OWNER ONE-TOOL 도입 4단계: 데이터 마이그레이션, 채널 통합, 자동화, 최적화. 기존 예약·고객 데이터를 한곳에 모아 운영을 단순화합니다.",
+    "원툴러 도입 4단계: 데이터 마이그레이션, 채널 통합, 자동화, 최적화. 기존 예약·고객 데이터를 한곳에 모아 운영을 단순화합니다.",
   alternates: { canonical: `${SITE_URL}/solution` },
   openGraph: {
-    title: "솔루션 소개 | OWNER ONE-TOOL",
+    title: "솔루션 소개 | 원툴러",
     description: "도입 4단계로 예약·고객·일정을 하나로 통합합니다.",
     url: `${SITE_URL}/solution`,
   },
@@ -43,7 +43,7 @@ export default function SolutionPage() {
     <div className="mx-auto max-w-4xl px-4 py-12 sm:py-16 md:py-20">
       <h1 className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">솔루션 소개</h1>
       <p className="mt-4 text-base text-gray-600 sm:text-lg">
-        OWNER ONE-TOOL은 데이터 마이그레이션부터 채널 통합, 자동화, 최적화까지 네 단계로 도입됩니다.
+        원툴러은 데이터 마이그레이션부터 채널 통합, 자동화, 최적화까지 네 단계로 도입됩니다.
       </p>
       <ol className="mt-12 space-y-8 sm:space-y-10" role="list">
         {steps.map((step, index) => (

@@ -36,7 +36,7 @@ export function Hero() {
           엑셀·카톡·예약앱 따로 쓰지 마세요.
           <br />
           <span className="relative inline-block">
-            <span className="relative z-10 text-amber-500">OWNER ONE-TOOL</span>
+            <span className="relative z-10 text-amber-500">원툴러</span>
             <span
               className="absolute bottom-1 left-0 -z-0 h-3 w-full rounded bg-amber-100 sm:h-4"
               aria-hidden

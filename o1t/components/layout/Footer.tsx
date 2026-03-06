@@ -121,7 +121,7 @@ export function Footer() {
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-center md:text-left text-base text-gray-600">
-              © {new Date().getFullYear()} ETERNAL SIX. OWNER ONE-TOOL. All rights reserved.
+              © {new Date().getFullYear()} ETERNAL SIX. 원툴러. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
               <Link href="/terms" className="min-touch inline-flex py-2 text-base text-gray-600 hover:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded" aria-label="이용약관">

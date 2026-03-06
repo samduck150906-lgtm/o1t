@@ -38,6 +38,14 @@ body {
   }
 }
 
+/* 세이프에리어 유틸리티 (헤더/모바일 메뉴 등) */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
 /* 데스크탑: 넓은 화면에서 읽기 폭 제한 없이 콘텐츠만 max-width로 제한 */
 @media (min-width: 1280px) {
   body {

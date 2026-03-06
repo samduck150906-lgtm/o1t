@@ -17,7 +17,7 @@ const organizationJsonLd = {
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "OWNER ONE-TOOL",
+  name: "원툴러",
   applicationCategory: "BusinessApplication",
   offers: {
     "@type": "Offer",
@@ -36,8 +36,8 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "OWNER ONE-TOOL | 자영업자 올인원 원툴 SaaS",
-    template: "%s | OWNER ONE-TOOL",
+    default: "원툴러 | 자영업자 올인원 원툴 SaaS",
+    template: "%s | 원툴러",
   },
   description:
     "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다. 엑셀·카톡·예약앱 따로 쓰지 마세요.",
@@ -52,15 +52,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: SITE_URL,
-    siteName: "OWNER ONE-TOOL",
-    title: "OWNER ONE-TOOL | 자영업자 올인원 원툴 SaaS",
+    siteName: "원툴러",
+    title: "원툴러 | 자영업자 올인원 원툴 SaaS",
     description:
       "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다.",
-    images: [{ url: `${SITE_URL}/logo.png`, width: 1200, height: 630, alt: "OWNER ONE-TOOL" }],
+    images: [{ url: `${SITE_URL}/logo.png`, width: 1200, height: 630, alt: "원툴러" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OWNER ONE-TOOL | 자영업자 올인원 원툴 SaaS",
+    title: "원툴러 | 자영업자 올인원 원툴 SaaS",
     description:
       "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다.",
     images: [`${SITE_URL}/logo.png`],
@@ -102,17 +102,12 @@ export default function RootLayout({
         )}
       </head>
       <body className="antialiased">
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='owneronetool-senior-mode';if(localStorage.getItem(k)==='1')document.body.classList.add('senior-mode');}catch(e){}})();`,
-          }}
-        />
         {isProposalPage ? (
           <>{children}</>
         ) : (
           <SessionProvider>
             <Header />
-            <main className="min-h-[50vh] w-full px-0 pb-0">{children}</main>
+            <main className="min-h-[50vh] w-full px-3 pb-6 sm:px-4 md:pb-8">{children}</main>
             <Footer />
           </SessionProvider>
         )}

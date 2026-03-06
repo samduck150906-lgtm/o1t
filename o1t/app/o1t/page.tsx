@@ -6,10 +6,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 export const metadata: Metadata = {
   title: "제품 상세",
   description:
-    "OWNER ONE-TOOL 제품 상세: 통합 대시보드, CRM, 예약 자동화. 예약·고객·일정을 한곳에서 관리하고 카톡 복붙으로 고객 명단을 자동 정리합니다.",
+    "원툴러 제품 상세: 통합 대시보드, CRM, 예약 자동화. 예약·고객·일정을 한곳에서 관리하고 카톡 복붙으로 고객 명단을 자동 정리합니다.",
   alternates: { canonical: `${SITE_URL}/o1t` },
   openGraph: {
-    title: "제품 상세 | OWNER ONE-TOOL",
+    title: "제품 상세 | 원툴러",
     description: "대시보드, CRM, 예약 자동화 기능 상세.",
     url: `${SITE_URL}/o1t`,
   },
@@ -38,7 +38,7 @@ export default function O1tPage() {
     <div className="mx-auto max-w-4xl px-4 py-16 md:py-20">
       <h1 className="text-3xl font-bold text-foreground md:text-4xl">제품 상세</h1>
       <p className="mt-4 text-lg text-gray-600">
-        OWNER ONE-TOOL의 대시보드, CRM, 예약 자동화 기능을 소개합니다.
+        원툴러의 대시보드, CRM, 예약 자동화 기능을 소개합니다.
       </p>
       <div className="mt-12 space-y-12">
         {features.map((feature, index) => (

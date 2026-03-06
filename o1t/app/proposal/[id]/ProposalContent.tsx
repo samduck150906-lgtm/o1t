@@ -83,7 +83,7 @@ export default function ProposalContent({ prospect }: Props) {
           <div className="mb-5 inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-white/80"
             style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
           >
-            OWNER ONE-TOOL &nbsp;·&nbsp; 맞춤 AI 자동화 제안서
+            원툴러 &nbsp;·&nbsp; 맞춤 AI 자동화 제안서
           </div>
 
           <h1 className="text-[22px] font-bold leading-snug text-white sm:text-[26px]">
@@ -367,7 +367,7 @@ export default function ProposalContent({ prospect }: Props) {
           <FadeSection>
             <div className="pb-4 pt-2 text-center">
               <p className="text-xs font-medium text-gray-400">
-                OWNER ONE-TOOL | ETERNAL SIX
+                원툴러 | ETERNAL SIX
               </p>
               <p className="mt-1 text-xs text-gray-400">AI 기반 업무 자동화 컨설팅</p>
             </div>

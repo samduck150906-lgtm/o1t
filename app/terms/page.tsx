@@ -5,7 +5,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 
 export const metadata: Metadata = {
   title: "이용약관",
-  description: "OWNER ONE-TOOL 서비스 이용약관.",
+  description: "원툴러 서비스 이용약관.",
   alternates: { canonical: `${SITE_URL}/terms` },
   robots: "index, follow",
 };
@@ -20,7 +20,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-foreground">제1조 (목적)</h2>
           <p>
-            본 약관은 ETERNAL SIX(이하 &quot;회사&quot;)가 제공하는 OWNER ONE-TOOL(이하 &quot;서비스&quot;)의 이용과 관련하여
+            본 약관은 ETERNAL SIX(이하 &quot;회사&quot;)가 제공하는 원툴러(이하 &quot;서비스&quot;)의 이용과 관련하여
             회사와 이용자 간의 권리·의무 및 책임 사항을 규정함을 목적으로 합니다.
           </p>
         </section>

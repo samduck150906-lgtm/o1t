@@ -3,7 +3,7 @@ import { getLandingDataByParams } from "@/lib/seo-keywords";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 
-export const alt = "OWNER ONE-TOOL 랜딩 Open Graph 이미지";
+export const alt = "원툴러 랜딩 Open Graph 이미지";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -29,7 +29,7 @@ export default async function OgImage({ params }: Props) {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          OWNER ONE-TOOL
+          원툴러
         </div>
       ),
       { ...size }
