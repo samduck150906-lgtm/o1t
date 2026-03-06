@@ -9,7 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        logo: ["var(--font-logo)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        logo: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         primary: "#0052FF",
