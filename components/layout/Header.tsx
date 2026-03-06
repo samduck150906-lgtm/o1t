@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 
@@ -27,17 +26,10 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4 md:h-14 md:px-5">
         <Link
           href="/"
-          className="flex min-h-[44px] min-w-[44px] items-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg -ml-1"
+          className="font-logo flex min-h-[44px] min-w-[44px] items-center text-xl sm:text-2xl font-semibold tracking-tight text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg -ml-1"
           aria-label="원툴러 홈으로 이동"
         >
-          <Image
-            src="/logo.png"
-            alt="원툴러"
-            width={140}
-            height={36}
-            className="h-7 w-auto sm:h-8"
-            priority
-          />
+          원툴러
         </Link>
 
         <nav className="hidden md:flex md:items-center md:gap-1" aria-label="주요 메뉴">
@@ -54,7 +46,7 @@ export function Header() {
         </nav>
 
         <div className="hidden md:flex md:items-center md:gap-1">
-          {status === "authenticated" ? (
+          {status === "authenticated" && (
             <>
               <Link
                 href="/dashboard"
@@ -71,23 +63,6 @@ export function Header() {
               >
                 로그아웃
               </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="min-touch inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-base font-medium text-foreground hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                aria-label="로그인"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/signup"
-                className="min-touch inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                aria-label="회원가입"
-              >
-                회원가입
-              </Link>
             </>
           )}
           <Link
@@ -141,7 +116,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            {status === "authenticated" ? (
+            {status === "authenticated" && (
               <>
                 <Link
                   href="/dashboard"
@@ -162,25 +137,6 @@ export function Header() {
                 >
                   로그아웃
                 </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="min-h-[48px] flex items-center rounded-lg px-4 py-3 text-base font-medium text-foreground hover:bg-gray-100 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-label="로그인"
-                >
-                  로그인
-                </Link>
-                <Link
-                  href="/signup"
-                  className="min-h-[48px] flex items-center rounded-lg px-4 py-3 text-base font-medium text-primary hover:bg-primary/5 active:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset"
-                  onClick={() => setMobileMenuOpen(false)}
-                  aria-label="회원가입"
-                >
-                  회원가입
-                </Link>
               </>
             )}
             <Link

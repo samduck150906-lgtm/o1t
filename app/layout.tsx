@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
+import { Gowun_Batang } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SessionProvider } from "@/components/SessionProvider";
+
+const gowunBatang = Gowun_Batang({
+  weight: "400",
+  subsets: ["latin", "korean"],
+  variable: "--font-logo",
+  display: "swap",
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 
@@ -92,7 +100,7 @@ export default function RootLayout({
           }}
         />
         </head>
-      <body className="antialiased">
+      <body className={`antialiased ${gowunBatang.variable}`}>
         <SessionProvider>
         <Header />
         <main className="min-h-[50vh] w-full px-3 pb-6 sm:px-4 md:pb-10">{children}</main>
