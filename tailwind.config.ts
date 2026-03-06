@@ -11,6 +11,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
         logo: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        footer: ["var(--font-footer)", "Nanum Gothic", "sans-serif"],
       },
       colors: {
         primary: "#0052FF",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR, Nanum_Gothic } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -11,6 +11,13 @@ const notoSansKR = Noto_Sans_KR({
   variable: "--font-sans",
   display: "swap",
   preload: false,
+});
+
+const nanumGothic = Nanum_Gothic({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-footer",
+  display: "swap",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
@@ -101,7 +108,7 @@ export default function RootLayout({
           }}
         />
         </head>
-      <body className={`antialiased ${notoSansKR.variable} font-sans`}>
+      <body className={`antialiased ${notoSansKR.variable} ${nanumGothic.variable} font-sans`}>
         <SessionProvider>
         <Header />
         <main className="min-h-[50vh] w-full px-3 pb-6 sm:px-4 md:pb-10">{children}</main>

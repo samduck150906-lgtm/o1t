@@ -24,7 +24,7 @@ const grouped = getIndustryGroupedKeywords();
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white mt-auto" role="contentinfo" aria-label="사이트 하단 정보">
+    <footer className="font-footer border-t border-gray-200 bg-white mt-auto" role="contentinfo" aria-label="사이트 하단 정보">
       <div className="mx-auto max-w-6xl px-4 py-12 md:px-6">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
