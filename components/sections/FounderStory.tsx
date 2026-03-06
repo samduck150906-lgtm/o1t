@@ -56,7 +56,7 @@ export function FounderStory() {
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-800">원툴러 창업자</p>
-              <p className="text-xs text-gray-400">파티룸 운영 3년차 · 직접 개발·운영 중</p>
+              <p className="text-xs text-gray-400">파티룸/렌탈스튜디오 사장 · 직접 개발·운영 중</p>
             </div>
           </footer>
         </div>
