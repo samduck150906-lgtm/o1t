@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Gowun_Batang } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SessionProvider } from "@/components/SessionProvider";
 
-const gowunBatang = Gowun_Batang({
-  weight: "400",
-  subsets: ["latin", "korean"],
-  variable: "--font-logo",
+const notoSansKR = Noto_Sans_KR({
+  weight: ["300", "400", "500", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-sans",
   display: "swap",
+  preload: false,
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
@@ -100,7 +101,7 @@ export default function RootLayout({
           }}
         />
         </head>
-      <body className={`antialiased ${gowunBatang.variable}`}>
+      <body className={`antialiased ${notoSansKR.variable} font-sans`}>
         <SessionProvider>
         <Header />
         <main className="min-h-[50vh] w-full px-3 pb-6 sm:px-4 md:pb-10">{children}</main>
