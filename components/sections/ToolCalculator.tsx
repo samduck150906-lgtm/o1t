@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export function ToolCalculator() {
   const [count, setCount] = useState(5);
+  const [confirmed, setConfirmed] = useState(false);
   const saved = count - 1;
 
   return (
@@ -49,7 +50,15 @@ export function ToolCalculator() {
           </button>
         </div>
 
-        {/* 결과 */}
+        <button
+          onClick={() => setConfirmed(true)}
+          className="mt-8 rounded-full bg-blue-500 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:bg-blue-600 active:bg-blue-700"
+        >
+          확인
+        </button>
+
+        {/* 결과 — 확인 누른 후에만 표시 */}
+        {confirmed && (
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
           <p className="mb-5 text-sm font-medium text-white/50 uppercase tracking-widest">
             원툴러 도입 후
@@ -72,6 +81,7 @@ export function ToolCalculator() {
             관리 시간을 <span className="font-bold text-white">대폭 줄일 수 있습니다.</span>
           </p>
         </div>
+        )}
       </div>
     </section>
   );
