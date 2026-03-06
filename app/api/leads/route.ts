@@ -47,8 +47,8 @@ export async function POST(request: Request) {
   lastSubmitByEmail.set(email.toLowerCase(), now);
   store.push({ email, source, at: new Date().toISOString() });
 
-  // 신청 내역을 cinging1000@naver.com 으로 발송
-  const recipient = "cinging1000@naver.com";
+  // 신청 내역 수신 (mailto 사용 시 참고용)
+  const recipient = "ceo@eternalsix.com";
   const apiKey = process.env.RESEND_API_KEY;
   if (apiKey) {
     try {

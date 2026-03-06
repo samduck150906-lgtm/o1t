@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const CONTACT_EMAIL = "ceo@eternalsix.com";
+
 const sources = [
   "검색(구글/네이버)",
   "지인 소개",
@@ -13,33 +15,24 @@ const sources = [
 export function DiagnosisForm() {
   const [email, setEmail] = useState("");
   const [source, setSource] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("loading");
     setMessage("");
-    try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setStatus("error");
-        setMessage(typeof data.message === "string" ? data.message : "제출에 실패했습니다. 다시 시도해 주세요.");
-        return;
-      }
-      setStatus("success");
-      setMessage("제출되었습니다. 빠른 시일 내에 연락드리겠습니다.");
-      setEmail("");
-      setSource("");
-    } catch {
+    if (!email.trim()) {
       setStatus("error");
-      setMessage("네트워크 오류가 발생했습니다. 다시 시도해 주세요.");
+      setMessage("이메일을 입력해 주세요.");
+      return;
     }
+    setStatus("idle");
+    const subject = encodeURIComponent("상담 신청");
+    const body = encodeURIComponent(
+      `이메일: ${email}\n유입 경로: ${source || "(미선택)"}\n\n상담 요청 내용을 아래에 적어 주세요.`
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    setMessage("메일 앱이 열립니다. 메일을 보내 주시면 빠르게 연락드리겠습니다.");
   }
 
   return (
@@ -50,7 +43,7 @@ export function DiagnosisForm() {
       noValidate
     >
       <h2 id="diagnosis-form-heading" className="text-2xl font-semibold text-foreground">
-        무료 진단 신청
+        무료 진단 / 상담 신청
       </h2>
       <p className="mt-2 text-base text-gray-700 leading-relaxed">
         이메일과 유입 경로를 알려주시면 맞춤 도입 단계와 예상 효과를 안내해 드립니다.
@@ -94,18 +87,17 @@ export function DiagnosisForm() {
       {message && (
         <p
           role="alert"
-          className={`mt-4 text-base ${status === "success" ? "text-green-600" : "text-red-600"}`}
+          className={`mt-4 text-base ${status === "error" ? "text-red-600" : "text-green-600"}`}
         >
           {message}
         </p>
       )}
       <button
         type="submit"
-        disabled={status === "loading"}
         className="mt-6 flex min-touch w-full items-center justify-center rounded-xl bg-primary px-4 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
-        aria-label="무료 진단 신청 제출"
+        aria-label="상담 신청 메일 열기"
       >
-        {status === "loading" ? "제출 중…" : "제출하기"}
+        이메일로 상담 신청하기
       </button>
     </form>
   );

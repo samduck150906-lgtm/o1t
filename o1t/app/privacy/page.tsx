@@ -86,7 +86,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-foreground">9. 문의</h2>
           <p>
             개인정보 처리와 관련한 문의·신고는 아래로 연락해 주세요.<br />
-            이메일: <a href="mailto:privacy@owneronetool.com" className="text-primary underline">privacy@owneronetool.com</a>
+            이메일: <a href="mailto:ceo@eternalsix.com" className="text-primary underline">ceo@eternalsix.com</a>
           </p>
         </section>
       </div>

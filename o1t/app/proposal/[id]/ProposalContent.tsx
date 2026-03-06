@@ -61,11 +61,14 @@ export default function ProposalContent({ prospect }: Props) {
 
   const totalTimeSaved = scenarios.reduce((sum, s) => sum + s.timeSaved, 0);
 
+  const CONTACT_EMAIL = "ceo@eternalsix.com";
+
   function handleCta() {
-    const url = `/diagnosis?from=proposal&store=${encodeURIComponent(
-      prospect.store_name
-    )}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    const subject = encodeURIComponent("상담 신청");
+    const body = encodeURIComponent(
+      `스토어명: ${prospect.store_name}\n\n상담 요청 내용을 아래에 적어 주세요.`
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     setCtaClicked(true);
   }
 

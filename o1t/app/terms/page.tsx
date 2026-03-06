@@ -89,7 +89,7 @@ export default function TermsPage() {
       </div>
 
       <p className="mt-10 text-sm text-gray-500">
-        문의: <a href="mailto:support@owneronetool.com" className="text-primary underline">support@owneronetool.com</a>
+        문의: <a href="mailto:ceo@eternalsix.com" className="text-primary underline">ceo@eternalsix.com</a>
       </p>
     </div>
   );
