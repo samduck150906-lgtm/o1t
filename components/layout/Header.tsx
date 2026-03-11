@@ -13,6 +13,11 @@ const navItems = [
   { href: "/diagnosis", label: "무료진단" },
 ];
 
+const consultingLinks = [
+  { href: "/solution/online", label: "매출증대컨설팅" },
+  { href: "/solution/automation", label: "자동화컨설팅" },
+];
+
 export function Header() {
   const { status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,6 +28,22 @@ export function Header() {
       role="banner"
       aria-label="메인 내비게이션"
     >
+      {/* 컨설팅 랜딩 링크 — 상단 구분 바 */}
+      <div className="border-b border-gray-100 bg-gray-50/80">
+        <div className="mx-auto flex max-w-6xl items-center justify-center gap-6 px-3 py-2 sm:px-4 md:px-5">
+          {consultingLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-xs font-medium text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 rounded px-2 py-1"
+              aria-label={`${item.label} 페이지로 이동`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4 md:h-14 md:px-5">
         <Link
           href="/"
@@ -105,6 +126,19 @@ export function Header() {
           aria-label="모바일 메뉴"
         >
           <nav className="flex flex-col px-3 py-3 gap-0" aria-label="모바일 메뉴">
+            <div className="flex gap-4 px-4 py-2 mb-2 border-b border-gray-100">
+              {consultingLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-xs font-medium text-gray-600 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset rounded px-2 py-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label={`${item.label} 페이지로 이동`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
             {navItems.map((item) => (
               <Link
                 key={item.href}
