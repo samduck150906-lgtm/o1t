@@ -6,6 +6,8 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
 const staticRoutes: { url: string; priority: number }[] = [
   { url: "/", priority: 1.0 },
   { url: "/solution", priority: 0.8 },
+  { url: "/solution/online", priority: 0.8 },
+  { url: "/solution/automation", priority: 0.8 },
   { url: "/pricing", priority: 0.8 },
   { url: "/diagnosis", priority: 0.8 },
   { url: "/faq", priority: 0.8 },

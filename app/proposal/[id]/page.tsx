@@ -61,6 +61,8 @@ async function getProposal(id: string): Promise<ProposalRow | null> {
   return data as ProposalRow;
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://xn--vl2b95y7ri.kr";
+
 // ========== 메타데이터 ==========
 export async function generateMetadata({
   params,
@@ -70,9 +72,26 @@ export async function generateMetadata({
   const { id } = await params;
   const proposal = await getProposal(id);
   if (!proposal) return { title: "제안서를 찾을 수 없습니다" };
+  const title = `${proposal.store_name} 맞춤 제안 | 원툴러`;
+  const description =
+    proposal.proposal_copy?.hero?.sub_headline ?? "맞춤 자동화 제안서";
+  const canonical = `${SITE_URL}/proposal/${id}`;
   return {
-    title: `${proposal.store_name} 맞춤 제안 | 원툴러`,
-    description: proposal.proposal_copy?.hero?.sub_headline ?? "맞춤 자동화 제안서",
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${title} | 원툴러`,
+      description,
+      url: canonical,
+      siteName: "원툴러",
+      images: [{ url: "/logo.png", width: 1200, height: 630, alt: "원툴러 맞춤 제안" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
