@@ -34,7 +34,7 @@ export async function GET() {
     orderBy: { updatedAt: "desc" },
   });
 
-  const payload = list.map((c) => ({
+  const payload = list.map((c: any) => ({
     id: c.id,
     name: c.name,
     phone: c.phone,

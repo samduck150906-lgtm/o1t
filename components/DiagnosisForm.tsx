@@ -15,10 +15,11 @@ const sources = [
 export function DiagnosisForm() {
   const [email, setEmail] = useState("");
   const [source, setSource] = useState("");
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("");
     if (!email.trim()) {
@@ -26,13 +27,33 @@ export function DiagnosisForm() {
       setMessage("이메일을 입력해 주세요.");
       return;
     }
+    
+    setLoading(true);
     setStatus("idle");
-    const subject = encodeURIComponent("상담 신청");
-    const body = encodeURIComponent(
-      `이메일: ${email}\n유입 경로: ${source || "(미선택)"}\n\n상담 요청 내용을 아래에 적어 주세요.`
-    );
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-    setMessage("메일 앱이 열립니다. 메일을 보내 주시면 빠르게 연락드리겠습니다.");
+
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "신청 중 오류가 발생했습니다.");
+      }
+
+      setStatus("idle");
+      setMessage("무료 진단 신청이 완료되었습니다. 곧 메일로 연락드리겠습니다!");
+      setEmail("");
+      setSource("");
+    } catch (err: any) {
+      setStatus("error");
+      setMessage(err.message || "서버 통신 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -94,10 +115,11 @@ export function DiagnosisForm() {
       )}
       <button
         type="submit"
+        disabled={loading}
         className="mt-6 flex min-touch w-full items-center justify-center rounded-xl bg-primary px-4 py-4 text-lg font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
-        aria-label="상담 신청 메일 열기"
+        aria-label={loading ? "신청 중..." : "무료 진단 신청하기"}
       >
-        이메일로 상담 신청하기
+        {loading ? "신청 중..." : "무료 진단 신청하기"}
       </button>
     </form>
   );

@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -44,12 +44,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -119,8 +119,8 @@ model Customer {
   businessId String   // tenant 분리: 반드시 session.businessId로 필터
   name       String?
   phone      String?
-  memo       String?  @db.Text
-  metadata   Json?    // 추가 필드
+  memo       String?
+  metadata   String?    // 추가 필드 (JSON 문자열)
 
   visitCount   Int       @default(0)   // 방문 횟수
   totalPayment Int       @default(0)   // 총 결제액(원)
@@ -138,24 +138,13 @@ model Customer {
   @@index([businessId])
 }
 
-// ——— 업종 (예약 metadata preset 분기용) ———
-enum IndustryType {
-  PARTYROOM   // 파티룸
-  BEAUTY      // 네일/미용
-  PET         // 펫 서비스
-  CLASS       // 클래스/수업
-  RENTAL      // 대여
-  CONSULTING  // 상담
-  CUSTOM      // 기타
-}
-
 // ——— 비즈니스(테넌트) ——— slug별 업종·설정, Multi-Tenant 분리 단위
 model Business {
   id           String       @id @default(cuid())
   userId       String
   slug         String       @unique // 예약 링크 경로 (e.g. my-shop)
   name         String?      // 상호명
-  industryType IndustryType @default(CUSTOM)
+  industryType String       @default("CUSTOM")
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   branches      Branch[]
@@ -181,7 +170,7 @@ model Branch {
   address    String?  // 주소
   openAt     String?  // 운영 시작 시간 (HH:mm)
   closeAt    String?  // 운영 종료 시간 (HH:mm)
-  memo       String?  @db.Text
+  memo       String?
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -204,10 +193,10 @@ model Reservation {
   phone    String?
   date     DateTime? // 예약일시
   people   Int?
-  notes    String?  @db.Text
+  notes    String?
   status   String?  // 예약대기 | 확정 | 문의 | 결제완료
   amount   Int?     // 결제금액(원)
-  metadata Json?    // 업종별 preset (industryType에 따라 구조 분기)
+  metadata String?    // 업종별 preset (JSON 문자열)
 
   customerId String? // 선택: 고객 명단과 연결
   branchId   String? // 선택: 매장(지점) — Pro/Enterprise
@@ -232,11 +221,11 @@ model ParseLog {
   userId            String
   businessId        String   // tenant 분리: 반드시 session.businessId로 필터
   type              String   // "booking" | "customer"
-  rawInput          String?  @db.Text // 텍스트 일부 또는 "image"
-  result            Json     // 파싱 결과 JSON
+  rawInput          String? // 텍스트 일부 또는 "image"
+  result            String?     // 파싱 결과 JSON (문자열)
   success           Boolean  @default(true)
   aiConfidenceScore Float?   // 0~1 신뢰도
-  aiRawOutput       Json?    // 모델 원본 JSON (감사/디버깅)
+  aiRawOutput       String?    // 모델 원본 JSON (문자열)
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -265,7 +254,7 @@ model Blacklist {
 model Lead {
   id         String   @id @default(cuid())
   email      String
-  source     String?  @db.VarChar(200)
+  source     String?
   businessId String?  // tenant 분리: 업장 연결 시 필수 필터
   createdAt  DateTime @default(now())
 

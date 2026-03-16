@@ -24,6 +24,13 @@ export function Hero() {
             무료진단
           </Link>
           <Link
+            href="/demo"
+            className="min-h-[48px] inline-flex w-full items-center justify-center rounded-xl border-2 border-primary bg-white px-6 py-3.5 text-base font-medium text-primary hover:bg-blue-50 active:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto break-keep"
+            aria-label="ERP 데모 미리보기"
+          >
+            👀 ERP 데모 보기
+          </Link>
+          <Link
             href="/pricing"
             className="min-h-[48px] inline-flex w-full items-center justify-center rounded-xl border-2 border-gray-300 bg-white px-6 py-3.5 text-base font-medium text-foreground hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto break-keep"
             aria-label="가격보기"

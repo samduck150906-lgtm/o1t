@@ -42,7 +42,7 @@ export async function GET() {
     include: { customer: { select: { id: true, name: true, phone: true } } },
   });
 
-  const items = list.map((r) => ({
+  const items = list.map((r: any) => ({
     id: r.id,
     name: r.name,
     phone: r.phone,
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       status: data.status ?? null,
       amount: data.amount ?? null,
       customerId: data.customerId ?? null,
-      metadata: (data.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
+      metadata: (data.metadata ?? undefined) as any,
     },
   });
 

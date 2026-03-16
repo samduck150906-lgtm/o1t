@@ -17,6 +17,21 @@ type CustomerItem = {
   updatedAt: string;
 };
 
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "-";
+  try {
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return d.toLocaleString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<CustomerItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,66 +86,113 @@ export default function CustomersPage() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-xl font-bold text-foreground md:text-2xl">고객 명단</h2>
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          ← 대시보드 홈
-        </Link>
+      <div className="erp-page-header">
+        <h2 className="erp-page-title">고객 관리</h2>
+        <p className="erp-page-subtitle">방문 이력, 매출, 노쇼 등 모든 상태를 종합적으로 관리합니다.</p>
       </div>
 
-      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-        <QuickAdd onSave={handleSaveCustomer} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 24, marginBottom: 24 }}>
+        <div className="erp-card">
+          <div className="erp-card__header">
+            <h3 className="erp-card__title">✨ AI 대화 분석으로 빠른 추가</h3>
+            <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 2 }}>
+              카카오톡이나 문자 대화만 복사/붙여넣기 해도 자동으로 이름과 연락처를 추출합니다.
+            </p>
+          </div>
+          <div className="erp-card__body">
+            <QuickAdd onSave={handleSaveCustomer} />
+          </div>
+        </div>
       </div>
 
-      <div className="mb-4">
-        <input
-          type="search"
-          placeholder="이름, 연락처, 메모로 검색"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-h-[44px] w-full max-w-md rounded-lg border border-gray-300 bg-white px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-          aria-label="고객 검색"
-        />
-      </div>
+      <div className="erp-card">
+        <div className="erp-card__header" style={{ flexWrap: "wrap", borderBottom: loading || filtered.length === 0 ? "none" : "1px solid var(--erp-border)" }}>
+          <h3 className="erp-card__title">고객 목록 ({filtered.length}명)</h3>
+          <input
+            type="search"
+            placeholder="이름, 연락처, 메모 검색..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="erp-input"
+            style={{ width: "240px" }}
+            aria-label="고객 검색"
+          />
+        </div>
 
-      {loading ? (
-        <p className="py-8 text-center text-gray-500">불러오는 중…</p>
-      ) : filtered.length === 0 ? (
-        <section className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
-          <p className="text-gray-500">등록된 고객이 없습니다.</p>
-          <p className="mt-2 text-sm text-gray-500">
-            위에서 카톡·문자 대화를 붙여넣어 고객을 추가하거나, 예약 추가 시 자동으로 반영됩니다.
-          </p>
-        </section>
-      ) : (
-        <section className="rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="text-lg font-semibold text-foreground">고객 목록 ({filtered.length}명)</h3>
-          <ul className="mt-4 space-y-3" role="list">
-            {filtered.map((c) => (
-              <li
-                key={c.id}
-                className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-gray-100 bg-gray-50/50 p-4"
-              >
-                <div className="min-w-0 flex-1 text-sm">
-                  <p className="font-medium text-foreground">{c.name ?? "(이름 없음)"}</p>
-                  <p className="text-gray-600">{c.phone ?? "-"}</p>
-                  {c.memo && <p className="mt-1 text-gray-500">{c.memo}</p>}
-                  <p className="mt-1 text-gray-500">
-                    방문 {c.visitCount}회 · 총 {c.totalPayment.toLocaleString()}원
-                    {c.lastVisitAt && ` · 마지막 방문 ${new Date(c.lastVisitAt).toLocaleDateString("ko-KR")}`}
-                  </p>
-                </div>
-                <span className="text-xs text-gray-400">
-                  등록: {new Date(c.createdAt).toLocaleDateString("ko-KR")}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+        <div className="erp-card__body" style={{ padding: 0 }}>
+          {loading ? (
+            <div style={{ padding: 20 }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="erp-skeleton" style={{ height: 48, marginBottom: 10 }} />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="erp-empty">
+              <div className="erp-empty__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-8 w-8">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                </svg>
+              </div>
+              <p className="erp-empty__title">검색된 고객이 없습니다</p>
+              <p className="erp-empty__desc">위의 빠른 추가 기능이나 예약 등록을 통해 고객을 추가해주세요.</p>
+            </div>
+          ) : (
+            <div className="erp-table-wrap">
+              <table className="erp-table">
+                <thead>
+                  <tr>
+                    <th>고객 정보</th>
+                    <th>방문 횟수</th>
+                    <th>총 결제액</th>
+                    <th>마지막 방문</th>
+                    <th>특이사항 / 메모</th>
+                    <th>등록일</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--erp-primary-light)", color: "var(--erp-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13 }}>
+                            {c.name ? c.name.charAt(0) : "?"}
+                          </div>
+                          <div>
+                            <p style={{ fontWeight: 600, fontSize: 13, color: "#111827" }}>
+                              {c.name ?? "(이름 없음)"}
+                            </p>
+                            <p style={{ fontSize: 12, color: "#6b7280" }}>{c.phone ?? "-"}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ fontSize: 13, fontWeight: 500 }}>
+                        <span className="erp-badge" style={{ background: "#f3f4f6", color: "#374151" }}>
+                          {c.visitCount}회
+                        </span>
+                      </td>
+                      <td style={{ fontSize: 13, fontWeight: 600 }}>
+                        {c.totalPayment > 0 ? `${c.totalPayment.toLocaleString()}원` : "-"}
+                      </td>
+                      <td style={{ fontSize: 13, color: "#4b5563" }}>
+                        {formatDate(c.lastVisitAt)}
+                      </td>
+                      <td style={{ fontSize: 13, color: "#6b7280", maxWidth: 220 }}>
+                        <div style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }} title={c.memo ?? ""}>
+                          {c.memo || "-"}
+                        </div>
+                      </td>
+                      <td style={{ fontSize: 12, color: "#9ca3af" }}>
+                        {formatDate(c.createdAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

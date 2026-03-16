@@ -8,8 +8,7 @@ const bodySchema = z.object({
   source: z.string().max(200).optional().default(""),
 });
 
-// DB 교체 포인트: Prisma, Supabase 등 연동
-const store: { email: string; source: string; at: string }[] = [];
+// DB 교체 완료: Prisma 연동
 
 /** 동일 이메일 재제출 제한: 5분 내 중복 시 거절 (메모리 기반, 프로덕션에서는 Redis 등 권장) */
 const lastSubmitByEmail = new Map<string, number>();
@@ -45,7 +44,19 @@ export async function POST(request: Request) {
     );
   }
   lastSubmitByEmail.set(email.toLowerCase(), now);
-  store.push({ email, source, at: new Date().toISOString() });
+
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    await prisma.lead.create({
+      data: {
+        email: email.toLowerCase(),
+        source: source || "direct",
+      },
+    });
+  } catch (dbError) {
+    console.error("DB 리드 저장 실패:", dbError);
+    // DB 저장 실패해도 이메일 발송은 시도할 수 있도록 진행 (또는 에러 반환)
+  }
 
   // 신청 내역 수신 (mailto 사용 시 참고용)
   const recipient = "ceo@eternalsix.com";

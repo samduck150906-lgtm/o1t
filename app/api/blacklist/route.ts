@@ -29,7 +29,7 @@ export async function GET() {
     select: { phone: true, createdAt: true },
   });
 
-  return NextResponse.json(list.map((r) => r.phone));
+  return NextResponse.json(list.map((r: { phone: string }) => r.phone));
 }
 
 export async function POST(request: Request) {

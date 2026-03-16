@@ -162,10 +162,10 @@ export async function POST(request: Request) {
           businessId: session.businessId,
           type: "booking",
           rawInput: rawText?.slice(0, 2000) ?? (imageBase64 ? "image" : null),
-          result: { ...result, aiConfidenceScore: result.aiConfidenceScore, aiRawOutput: result.aiRawOutput } as Prisma.InputJsonValue,
+          result: { ...result, aiConfidenceScore: result.aiConfidenceScore, aiRawOutput: result.aiRawOutput } as any,
           success: true,
           aiConfidenceScore: result.aiConfidenceScore,
-          aiRawOutput: result.aiRawOutput as Prisma.InputJsonValue,
+          aiRawOutput: result.aiRawOutput as any,
         },
       });
     }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ReservationList } from "@/components/dashboard/ReservationList";
 import type { ReservationItem } from "@/app/dashboard/DashboardClient";
 import Link from "next/link";
+import { PasteDropZone } from "@/components/dashboard/PasteDropZone";
 
 export default function ReservationsPage() {
   const [items, setItems] = useState<ReservationItem[]>([]);
@@ -36,6 +37,14 @@ export default function ReservationsPage() {
     );
   });
 
+  const handleAdd = useCallback(
+    (r: ReservationItem) => {
+      setItems((prev) => [r, ...prev]);
+      fetchList();
+    },
+    [fetchList]
+  );
+
   const handleRemove = useCallback(async (id: string) => {
     try {
       await fetch(`/api/reservations/${id}`, { method: "DELETE" });
@@ -45,49 +54,85 @@ export default function ReservationsPage() {
     }
   }, []);
 
+  const dataToDisplay = filter ? filtered.filter((r) => r.status === filter) : filtered;
+
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-xl font-bold text-foreground md:text-2xl">예약 리스트</h2>
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          ← 대시보드 홈
-        </Link>
+      <div className="erp-page-header">
+        <h2 className="erp-page-title">예약 및 상담 리스트</h2>
+        <p className="erp-page-subtitle">모든 예약, 상담 내역을 최신순으로 확인하고 관리합니다.</p>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-3">
-        <input
-          type="search"
-          placeholder="이름, 연락처, 메모로 검색"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-h-[44px] flex-1 min-w-[200px] rounded-lg border border-gray-300 bg-white px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-          aria-label="예약 검색"
-        />
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="min-h-[44px] rounded-lg border border-gray-300 bg-white px-4 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-          aria-label="상태 필터"
-        >
-          <option value="">전체 상태</option>
-          <option value="예약대기">예약대기</option>
-          <option value="확정">확정</option>
-          <option value="문의">문의</option>
-          <option value="결제완료">결제완료</option>
-        </select>
+      <div className="erp-card" style={{ marginBottom: 24 }}>
+        <div className="erp-card__header">
+          <h3 className="erp-card__title">✨ AI 예약 자동 추가</h3>
+        </div>
+        <div className="erp-card__body">
+          <PasteDropZone onAdd={handleAdd} onSaved={fetchList} />
+        </div>
       </div>
 
-      {loading ? (
-        <p className="py-8 text-center text-gray-500">불러오는 중…</p>
-      ) : (
-        <ReservationList
-          items={filter ? filtered.filter((r) => r.status === filter) : filtered}
-          onRemove={handleRemove}
-        />
-      )}
+      <div className="erp-card">
+        <div className="erp-card__header" style={{ flexWrap: "wrap" }}>
+          <h3 className="erp-card__title">전체 예약 목록 ({dataToDisplay.length})</h3>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input
+              type="search"
+              placeholder="이름, 연락처 검색..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="erp-input"
+              style={{ width: "200px" }}
+              aria-label="예약 검색"
+            />
+            <div style={{ position: "relative" }}>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="erp-input"
+                style={{ width: "120px", appearance: "none", paddingRight: 30 }}
+                aria-label="상태 필터"
+              >
+                <option value="">전체 상태</option>
+                <option value="예약대기">예약대기</option>
+                <option value="확정">확정</option>
+                <option value="문의">문의</option>
+                <option value="결제완료">결제완료</option>
+                <option value="노쇼">노쇼</option>
+              </select>
+              <svg 
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+                style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, pointerEvents: "none", color: "#6b7280" }}
+              >
+                <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div className="erp-card__body" style={{ padding: 0 }}>
+          {loading ? (
+            <div style={{ padding: 20 }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="erp-skeleton" style={{ height: 48, marginBottom: 10 }} />
+              ))}
+            </div>
+          ) : (
+            <ReservationList
+              items={dataToDisplay}
+              onRemove={handleRemove}
+              onUpdateStatus={async (id, status) => {
+                await fetch(`/api/reservations/${id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ status }),
+                });
+                fetchList();
+              }}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
