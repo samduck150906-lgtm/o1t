@@ -59,9 +59,6 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION ?? "",
-    other: {
-      "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_VERIFICATION ?? "",
-    },
   },
   openGraph: {
     type: "website",
@@ -95,6 +92,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <meta
+          name="naver-site-verification"
+          content="8a16afbe7fa4a4754a3d8b95a130d7cdf4cd811a"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
