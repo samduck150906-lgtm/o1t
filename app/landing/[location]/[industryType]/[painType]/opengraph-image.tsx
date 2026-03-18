@@ -1,7 +1,10 @@
 import { ImageResponse } from "next/og";
 import { getLandingDataByParams } from "@/lib/seo-keywords";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
 
 export const alt = "원툴러 랜딩 Open Graph 이미지";
 export const size = { width: 1200, height: 630 };

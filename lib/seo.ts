@@ -9,13 +9,17 @@ import {
   landingKeywords,
   type SeoKeyword,
 } from "@/lib/seo-keywords";
+import { PRICING_PAGE_SEO } from "@/lib/seo-pricing";
 
 export const SITE = {
   name: "원툴러 ONETOOLER",
 };
 
+/** 공식 도메인: 원툴러.kr (배포 시 NEXT_PUBLIC_SITE_URL 권장) */
+export const SITE_ORIGIN = "https://원툴러.kr";
+
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? SITE_ORIGIN).replace(/\/$/, "");
 }
 
 export type StaticSeoEntry = {
@@ -45,6 +49,7 @@ export const STATIC_SEO_MAP: Record<string, StaticSeoEntry> = {
       description:
         "리드 관리·후속 조치까지 영업 프로세스를 재설계하고 자동화합니다.",
     },
+    pricing: { ...PRICING_PAGE_SEO },
   };
 
 export function getStaticSeoPaths(): string[] {

@@ -11,7 +11,10 @@ import {
 } from "@/lib/seo-keywords";
 import { FloatingDiagnosisCta } from "@/components/landing/FloatingDiagnosisCta";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
 const BRAND = "ETERNAL SIX";
 
 /** 랜딩 페이지가 받는 3개 props (params 기준) */

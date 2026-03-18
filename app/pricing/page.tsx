@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DashboardRedirectBanner } from "./DashboardRedirectBanner";
 
-import { STATIC_SEO_MAP, getSiteUrl } from "@/lib/seo";
+import { PRICING_PAGE_SEO } from "@/lib/seo-pricing";
 
-const SITE_URL = getSiteUrl();
-const pricingSeo = STATIC_SEO_MAP.pricing;
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
+const pricingSeo = PRICING_PAGE_SEO;
 
 export const metadata: Metadata = {
   title: pricingSeo.title,

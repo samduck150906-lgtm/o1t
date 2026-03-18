@@ -20,7 +20,10 @@ const nanumGothic = Nanum_Gothic({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onetooler.kr";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
 
 const organizationJsonLd = {
   "@context": "https://schema.org",

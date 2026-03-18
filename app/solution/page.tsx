@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
 
 export const metadata: Metadata = {
   title: "솔루션 소개",

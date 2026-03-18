@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { FAQJsonLd } from "./FAQJsonLd";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://원툴러.kr").replace(
+  /\/$/,
+  ""
+);
 
 export const metadata: Metadata = {
   title: "FAQ",
