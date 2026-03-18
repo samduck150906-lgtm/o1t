@@ -20,24 +20,35 @@ const nanumGothic = Nanum_Gothic({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onetooler.kr";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "ETERNAL SIX",
+  name: "이터널식스",
+  legalName: "이터널식스",
   url: SITE_URL,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "삼성로 186 4층",
+    addressLocality: "수원시 영통구",
+    addressRegion: "경기도",
+    addressCountry: "KR",
+  },
 };
 
 const softwareApplicationJsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "원툴러",
+  alternateName: "ONETOOLER",
   applicationCategory: "BusinessApplication",
+  url: SITE_URL,
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "KRW",
+    description: "무료 진단 제공",
   },
 };
 
@@ -51,31 +62,45 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "원툴러 | 자영업자 올인원 원툴 SaaS",
+    default: "원툴러 | 사장님을 위한 단 하나의 예약·고객 관리 자동화 툴",
     template: "%s | 원툴러",
   },
   description:
-    "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다. 엑셀·카톡·예약앱 따로 쓰지 마세요.",
+    "카톡, 전화, 예약앱, 엑셀을 하나로. 예약 확정부터 노쇼 방지 리마인드, CRM 자동 정리까지 원툴러로 매장 운영을 100% 자동화하세요.",
+  keywords: [
+    "예약관리프로그램",
+    "고객관리프로그램",
+    "CRM",
+    "노쇼방지",
+    "카톡예약자동화",
+    "원툴러",
+  ],
   alternates: { canonical: SITE_URL },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION ?? "",
+    ...(process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION
+      ? { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION }
+      : {}),
+    /** 네이버 서치어드바이저 — Metadata API로 출력(수동 head만으로는 누락될 수 있음) */
+    other: {
+      "naver-site-verification": "8a16afbe7fa4a4754a3d8b95a130d7cdf4cd811a",
+    },
   },
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: SITE_URL,
     siteName: "원툴러",
-    title: "원툴러 | 자영업자 올인원 원툴 SaaS",
+    title: "엑셀·카톡 따로 쓰지 마세요. 매장 운영은 원툴러 하나면 끝.",
     description:
-      "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다.",
-    images: [{ url: `${SITE_URL}/logo.png`, width: 1200, height: 630, alt: "원툴러" }],
+      "카톡, 전화, 예약앱, 엑셀을 하나로. 예약 확정부터 노쇼 방지 리마인드, CRM 자동 정리까지.",
+    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "원툴러" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "원툴러 | 자영업자 올인원 원툴 SaaS",
+    title: "원툴러 | 예약·고객 관리 자동화",
     description:
-      "사장님을 위한 단 하나의 운영툴. 예약·고객·일정을 하나로 통합하고, 카톡 복붙만으로 고객 명단을 자동 정리합니다.",
-    images: [`${SITE_URL}/logo.png`],
+      "카톡, 전화, 예약앱, 엑셀을 하나로. 예약·CRM 자동화.",
+    images: [`${SITE_URL}/og-image.jpg`],
   },
   robots: {
     index: true,
@@ -92,10 +117,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <meta
-          name="naver-site-verification"
-          content="8a16afbe7fa4a4754a3d8b95a130d7cdf4cd811a"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

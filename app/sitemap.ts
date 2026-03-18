@@ -1,32 +1,59 @@
 import { MetadataRoute } from "next";
 import { landingKeywords } from "@/lib/seo-keywords";
+import {
+  getAllDynamicSlugs,
+  getDynamicSeo,
+  getSiteUrl,
+  getStaticSeoPaths,
+} from "@/lib/seo";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
-
-const staticRoutes: { url: string; priority: number }[] = [
-  { url: "/", priority: 1.0 },
-  { url: "/solution", priority: 0.8 },
-  { url: "/solution/online", priority: 0.8 },
-  { url: "/solution/automation", priority: 0.8 },
-  { url: "/pricing", priority: 0.8 },
-  { url: "/diagnosis", priority: 0.8 },
-  { url: "/faq", priority: 0.8 },
-  { url: "/o1t", priority: 0.8 },
+const extraStatic = [
+  "/solution",
+  "/solution/online",
+  "/solution/automation",
+  "/diagnosis",
+  "/faq",
+  "/o1t",
+  "/terms",
+  "/privacy",
 ];
 
-/** SSG 랜딩 200개 + 정적 페이지를 sitemap에 포함해 검색 엔진이 모두 크롤링할 수 있도록 함 */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((r) => ({
-    url: `${baseUrl}${r.url}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: r.priority,
-  }));
-  const landingEntries: MetadataRoute.Sitemap = landingKeywords.map((kw) => ({
-    url: `${baseUrl}/landing/${kw.locationId}/${kw.industryId}/${kw.painId}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
-  return [...staticEntries, ...landingEntries];
+  const baseUrl = getSiteUrl();
+  const seen = new Set<string>();
+  const out: MetadataRoute.Sitemap = [];
+
+  const push = (path: string, priority: number, freq: MetadataRoute.Sitemap[0]["changeFrequency"]) => {
+    const url = path === "/" || path === "" ? `${baseUrl}/` : `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+    if (seen.has(url)) return;
+    seen.add(url);
+    out.push({
+      url,
+      lastModified: new Date(),
+      changeFrequency: freq,
+      priority,
+    });
+  };
+
+  for (const p of getStaticSeoPaths()) {
+    const path = p === "" ? "/" : `/${p}`;
+    push(path, p === "" ? 1 : 0.85, "weekly");
+  }
+
+  for (const ep of extraStatic) {
+    push(ep, 0.75, "weekly");
+  }
+
+  for (const slug of getAllDynamicSlugs()) {
+    const seo = getDynamicSeo(slug);
+    if (seo) {
+      push(`/${slug}`, 0.7, "weekly");
+    }
+  }
+
+  for (const kw of landingKeywords) {
+    push(`/landing/${kw.locationId}/${kw.industryId}/${kw.painId}`, 0.65, "weekly");
+  }
+
+  return out;
 }

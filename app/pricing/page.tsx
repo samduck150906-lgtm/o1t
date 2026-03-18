@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DashboardRedirectBanner } from "./DashboardRedirectBanner";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
+import { STATIC_SEO_MAP, getSiteUrl } from "@/lib/seo";
+
+const SITE_URL = getSiteUrl();
+const pricingSeo = STATIC_SEO_MAP.pricing;
 
 export const metadata: Metadata = {
-  title: "가격",
-  description:
-    "원툴러 요금: Starter 29,000원, Pro 59,000원(가장 많이 선택), Enterprise 별도 문의. 14일 무료 체험 후 유료 전환, 약정 없이 해지 가능.",
+  title: pricingSeo.title,
+  description: `${pricingSeo.description} Starter 29,000원, Pro 59,000원, Enterprise 별도 문의. 14일 무료 체험.`,
   alternates: { canonical: `${SITE_URL}/pricing` },
   openGraph: {
-    title: "가격 | 원툴러",
-    description: "Starter·Pro·Enterprise 플랜. 14일 무료 체험.",
+    title: pricingSeo.title,
+    description: pricingSeo.description,
     url: `${SITE_URL}/pricing`,
   },
 };

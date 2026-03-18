@@ -46,6 +46,16 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/consulting/sales" className="min-touch inline-flex py-2 text-base text-gray-700 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                  매출 증대 AI 컨설팅
+                </Link>
+              </li>
+              <li>
+                <Link href="/consulting/automation" className="min-touch inline-flex py-2 text-base text-gray-700 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                  업무 자동화 컨설팅
+                </Link>
+              </li>
+              <li>
                 <Link href="/diagnosis" className="min-touch inline-flex py-2 text-base text-gray-700 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
                   무료 진단
                 </Link>
@@ -114,9 +124,9 @@ export function Footer() {
             <ul className="space-y-1 break-keep" aria-label="사업자 정보">
               <li>상호: 이터널식스</li>
               <li>대표: 성아름</li>
-              <li>사업자등록번호: 3032865658</li>
+              <li>사업자등록번호: 303-28-65658</li>
               <li>전화: 010-8111-9370</li>
-              <li>주소: 수원시 영통구 삼성로 186 4층</li>
+              <li>주소: 경기도 수원시 영통구 삼성로 186 4층</li>
             </ul>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
