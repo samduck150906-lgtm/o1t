@@ -53,14 +53,14 @@
             const res = await fetch(BASE_URL + "/api/orders", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ amount, orderName: "테스트 주문" }),
+              body: JSON.stringify({ amount, orderName: " 주문" }),
             });
             const { orderId } = await res.json();
             if (!orderId) throw new Error("주문 생성 실패");
 
             await widgets.requestPayment({
               orderId,
-              orderName: "테스트 주문",
+              orderName: " 주문",
               successUrl: BASE_URL + "/success.html",
               failUrl: BASE_URL + "/fail.html",
             });
