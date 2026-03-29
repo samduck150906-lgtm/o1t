@@ -7,8 +7,7 @@ import {
   ShieldAlert,
   Clock,
   TrendingDown,
-  Sparkles,
-} from "lucide-react";
+  Sparkles } from "lucide-react";
 
 // ========== proposal_copy (JSONB) 스키마 타입 ==========
 export interface ProposalCopyHero {

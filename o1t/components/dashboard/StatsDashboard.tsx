@@ -9,8 +9,7 @@ import {
   getConversionRate,
   getNoShowRate,
   getRevisitRate,
-  type Period,
-} from "@/lib/stats";
+  type Period } from "@/lib/stats";
 
 type StatsDashboardProps = {
   items: Reservation[];

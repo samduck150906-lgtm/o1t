@@ -4,8 +4,7 @@ import {
   isWebhookAlreadyProcessed,
   markWebhookProcessed,
   verifyPaymentStatusWebhook,
-  verifyDepositWebhookSecret,
-} from "@/lib/webhook-toss";
+  verifyDepositWebhookSecret } from "@/lib/webhook-toss";
 import { prisma } from "@/lib/prisma";
 import { GRACE_DAYS } from "@/lib/subscription";
 

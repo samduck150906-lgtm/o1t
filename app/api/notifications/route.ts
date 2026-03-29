@@ -4,8 +4,7 @@ import {
   getNotifications,
   getUnreadCount,
   markRead,
-  markAllRead,
-} from "@/lib/notification-store";
+  markAllRead } from "@/lib/notification-store";
 
 const PAID_COOKIE_NAME = "o1t_paid";
 const SLUG_COOKIE_NAME = "o1t_slug";

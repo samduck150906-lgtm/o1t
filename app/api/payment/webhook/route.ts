@@ -4,8 +4,7 @@ import {
   isWebhookAlreadyProcessed,
   markWebhookProcessed,
   verifyPaymentStatusWebhook,
-  verifyDepositWebhookSecret,
-} from "@/lib/webhook-toss";
+  verifyDepositWebhookSecret } from "@/lib/webhook-toss";
 import { prisma } from "@/lib/prisma";
 
 // 토스 문서: PAYMENT_STATUS_CHANGED는 data, DEPOSIT_CALLBACK은 secret/orderId/transactionKey 등

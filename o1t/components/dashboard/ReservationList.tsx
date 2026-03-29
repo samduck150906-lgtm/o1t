@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import type { Reservation } from "@/lib/reservations";
 import {
   getCustomerKey,
-  getNoShowCountByCustomer,
-} from "@/lib/customer-stats";
+  getNoShowCountByCustomer } from "@/lib/customer-stats";
 import { addToBlacklist, isBlacklisted } from "@/lib/blacklist";
 import { canManageBlacklist } from "@/lib/roles";
 

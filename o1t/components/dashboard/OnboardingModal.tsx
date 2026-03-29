@@ -8,8 +8,7 @@ import {
   setIndustry,
   getSetupGuide,
   INDUSTRY_LABELS,
-  type Industry,
-} from "@/lib/onboarding";
+  type Industry } from "@/lib/onboarding";
 
 type OnboardingModalProps = {
   onComplete?: () => void;

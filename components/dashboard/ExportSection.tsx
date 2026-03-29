@@ -5,8 +5,7 @@ import {
   buildCustomerListCsv,
   buildReservationHistoryCsv,
   buildTaxSalesCsv,
-  downloadCsv,
-} from "@/lib/export-data";
+  downloadCsv } from "@/lib/export-data";
 import { canExportData } from "@/lib/roles";
 
 type ExportSectionProps = {

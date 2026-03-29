@@ -11,8 +11,7 @@ import { getIndustry } from "@/lib/onboarding";
 import {
   getDashboardWidgetOrder,
   getDashboardWidgetOrderByIndustryType,
-  type DashboardWidgetId,
-} from "@/lib/dashboard-widget-order";
+  type DashboardWidgetId } from "@/lib/dashboard-widget-order";
 
 export type ReservationItem = {
   id: string;

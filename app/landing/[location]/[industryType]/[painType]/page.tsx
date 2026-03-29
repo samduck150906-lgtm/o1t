@@ -7,8 +7,7 @@ import {
   getMetaDescription,
   getSameIndustryOtherLocations,
   INDUSTRY_PAIN_COPY,
-  type SeoKeyword,
-} from "@/lib/seo-keywords";
+  type SeoKeyword } from "@/lib/seo-keywords";
 import { FloatingDiagnosisCta } from "@/components/landing/FloatingDiagnosisCta";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://owneronetool.com";
