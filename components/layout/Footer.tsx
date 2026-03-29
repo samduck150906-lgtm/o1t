@@ -125,8 +125,9 @@ export function Footer() {
               <li>상호: 이터널식스</li>
               <li>대표: 성아름</li>
               <li>사업자등록번호: 303-28-65658</li>
+              <li>통신판매업: 제 2025-수원영통-1499호</li>
               <li>전화: 010-8111-9370</li>
-              <li>주소: 경기도 수원시 영통구 삼성로 186 4층</li>
+              <li>주소: 경기도 수원시 영통구 삼성로 186-1 4층</li>
             </ul>
           </div>
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
